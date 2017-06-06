@@ -35,8 +35,8 @@ class ZMJRecentWeatherView: UIView {
                     break
                 }
             }
-            topView.setTemps(recentWeathers: recentWeathers)
-            
+            topView.weathers = recentWeathers
+
             middleView.setTemps(recentWeathers: recentWeathers)
             middleView.resetTemplines()
         }
@@ -59,31 +59,231 @@ class ZMJRecentWeatherView: UIView {
     }
     
     private func initSubViews() {
-        topView.backgroundColor = UIColor.red
+        topView.backgroundColor = blueColor
         self.addSubview(topView)
         
-        middleView.backgroundColor = UIColor.init(red: 94/255.0, green: 201/255.0, blue: 255/255.0, alpha: 1.0)
+        middleView.backgroundColor = blueColor
         self.addSubview(middleView)
 
         bottomView.backgroundColor = UIColor.blue
         self.addSubview(bottomView)
     }
     
-    func showTemplines() {
+    func showRecentDetails() {
+        topView.showDate()
         middleView.showTemplines()
     }
     
-    func resetTemplines() {
+    func resetRecentDetails() {
+        topView.hideDate()
         middleView.resetTemplines()
+    }
+    
+    func set(offsetRatio:Float) {
+        topView.set(offsetRatio: offsetRatio)
     }
 }
 
 // 未来天气
 private class ZMJRecentTopView: UIView {
-    var maxTemps:Array<Int> = []
-    var minTemps:Array<Int> = []
-    func setTemps(recentWeathers:Array<ZMJWeather>) {
+    
+    private var weatherViews:Array<WeatherView> = []
+    var hideView:UIView = UIView.init()
+    
+    var weathers:Array<ZMJWeather> = [] {
+        didSet {
+            initSubViews()
+        }
+    }
+    
+    let weeks:Dictionary<String, String> = ["星期一" :"周一", "星期二" :"周二", "星期三" :"周三", "星期四" :"周四", "星期五" :"周五", "星期六" :"周六", "星期日" :"周日"]
+    
+    func initSubViews() {
+        for view in weatherViews {
+            view.removeFromSuperview()
+        }
+        weatherViews = []
+        for (index, weather) in weathers.enumerated() {
+            let weatherView = WeatherView.init(weather: weather)
+            weatherView.backgroundColor = .clear
+            self.addSubview(weatherView)
+            weatherViews.append(weatherView)
+            
+            let dateFormatter:DateFormatter = DateFormatter.init()
+            dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
+            let nowDate:Date! = dateFormatter.date(from: weather.date)
+            if index == 0 {
+                weatherView.weekLabel.text = "今日"
+            } else {
+                dateFormatter.setLocalizedDateFormatFromTemplate("EEEE")
+                let week = weeks[dateFormatter.string(from: nowDate)]
+                weatherView.weekLabel.text = week
+            }
+            
+            dateFormatter.setLocalizedDateFormatFromTemplate("M.d")
+            let date = dateFormatter.string(from: nowDate).replacingOccurrences(of: "/", with: ".")
+            weatherView.dateLabel.text = date
+            
+            let signName:NSString = NSString.init(format: "weather%@_icon", weather.weatherCode)
+            weatherView.weatherSign.image = UIImage.init(named: signName as String)?.withRenderingMode(.alwaysTemplate)
+            weatherView.tintColor = grayColor
+            
+            weatherView.maxTempLabel.text = weather.maxTemp
+            weatherView.minTempLabel.text = weather.minTemp
+        }
         
+        hideView.backgroundColor = UIColor.white
+        hideView.layer.shadowColor = UIColor.white.cgColor
+        hideView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+        hideView.layer.shadowRadius = 2.0
+        hideView.layer.shadowOpacity = 1.0
+        insertSubview(hideView, at: 0)
+        hideView.snp.makeConstraints { (make) in
+            make.top.equalToSuperview()
+            make.left.equalToSuperview()
+            make.right.equalToSuperview()
+            make.height.equalTo(83.0)
+        }
+    }
+    
+    override func layoutSubviews() {
+        let itemWidth:CGFloat = self.frame.width / CGFloat(weathers.count)
+        for (index, weatherView) in weatherViews.enumerated() {
+            weatherView.frame = CGRect.init(x: itemWidth / 2 + CGFloat(index) * itemWidth, y: 0, width: itemWidth - 30, height: self.frame.height)
+            weatherView.center = CGPoint.init(x: itemWidth / 2 + CGFloat(index) * itemWidth, y: self.frame.height / 2.0)
+        }
+    }
+    
+    func showDate() {
+        for weatherView in weatherViews {
+            weatherView.showDate()
+        }
+        UIView.animate(withDuration: 0.25) { 
+            self.hideView.alpha = 0.0
+        }
+    }
+    
+    func hideDate() {
+        for weatherView in weatherViews {
+            weatherView.hideDate()
+        }
+        UIView.animate(withDuration: 0.25) {
+            self.hideView.alpha = 1.0
+        }
+    }
+    
+    func set(offsetRatio:Float) {
+        hideView.alpha = CGFloat(1 - offsetRatio)
+        for weatherView in weatherViews {
+            weatherView.set(offsetRatio: offsetRatio)
+        }
+    }
+    
+    private class WeatherView: UIView {
+        var weather:ZMJWeather!
+        var dateLabel:UILabel = UILabel()
+        var weekLabel:UILabel = UILabel()
+        var weatherSign:UIImageView = UIImageView()
+        var maxTempLabel:UILabel = UILabel()
+        var minTempLabel:UILabel = UILabel()
+        
+        init(weather: ZMJWeather) {
+            super.init(frame: CGRect.zero)
+            self.weather = weather
+            initSubViews()
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        func initSubViews()  {
+            weekLabel.textColor = grayColor
+            weekLabel.font = UIFont.systemFont(ofSize: 12.0)
+            addSubview(weekLabel)
+            weekLabel.snp.makeConstraints { (make) in
+                make.top.equalToSuperview().offset(6.0)
+                make.centerX.equalToSuperview()
+            }
+            
+            dateLabel.textColor = .white
+            dateLabel.font = UIFont.systemFont(ofSize: 12.0)
+            addSubview(dateLabel)
+            dateLabel.snp.makeConstraints { (make) in
+                make.top.equalTo(weekLabel.snp.bottom).offset(0.0)
+                make.centerX.equalToSuperview()
+                make.height.equalTo(0.0)
+            }
+            
+            weatherSign.contentMode = UIViewContentMode.scaleAspectFit
+            addSubview(weatherSign)
+            weatherSign.snp.makeConstraints { (make) in
+                make.top.equalTo(dateLabel.snp.bottom).offset(5.0)
+                make.width.equalTo(42.0)
+                make.height.equalTo(weatherSign.snp.width)
+                make.centerX.equalToSuperview()
+            }
+            
+            maxTempLabel.textColor = .white
+            maxTempLabel.font = UIFont.systemFont(ofSize: 12.0)
+            addSubview(maxTempLabel)
+            maxTempLabel.snp.makeConstraints { (make) in
+                make.top.equalTo(weatherSign.snp.bottom).offset(5.0)
+                make.centerX.equalToSuperview()
+                make.height.equalTo(weekLabel.snp.height)
+            }
+            
+            minTempLabel.textColor = .white
+            minTempLabel.font = UIFont.systemFont(ofSize: 12.0)
+            addSubview(minTempLabel)
+            minTempLabel.snp.makeConstraints { (make) in
+                make.top.equalTo(maxTempLabel.snp.bottom).offset(5.0)
+                make.bottom.equalToSuperview()
+                make.centerX.equalToSuperview()
+                make.height.equalTo(weekLabel.snp.height)
+            }
+        }
+        
+        func showDate() {
+            dateLabel.snp.remakeConstraints { (make) in
+                make.top.equalTo(weekLabel.snp.bottom).offset(5.0)
+                make.centerX.equalToSuperview()
+                make.height.equalTo(weekLabel.snp.height)
+            }
+            UIView.animate(withDuration: 0.25) { 
+                self.layoutSubviews()
+                self.dateLabel.textColor = UIColor.white
+                self.weekLabel.textColor = UIColor.white
+                self.maxTempLabel.textColor = UIColor.white
+                self.minTempLabel.textColor = UIColor.white
+                self.weatherSign.tintColor = UIColor.white
+            }
+        }
+        
+        func hideDate() {
+            dateLabel.snp.remakeConstraints { (make) in
+                make.top.equalTo(weekLabel.snp.bottom).offset(0.0)
+                make.centerX.equalToSuperview()
+                make.height.equalTo(0.0)
+            }
+            UIView.animate(withDuration: 0.25) {
+                self.layoutSubviews()
+                self.dateLabel.textColor = grayColor
+                self.weekLabel.textColor = grayColor
+                self.maxTempLabel.textColor = grayColor
+                self.minTempLabel.textColor = grayColor
+                self.weatherSign.tintColor = grayColor
+            }
+        }
+        
+        func set(offsetRatio:Float) {
+            let color = UIColor.init(red: (CGFloat(204 + 51 * offsetRatio)) / 255.0, green: (CGFloat(204 + 51 * offsetRatio)) / 255.0, blue: (CGFloat(204 + 51 * offsetRatio)) / 255.0, alpha: 1.0)
+            self.dateLabel.textColor = color
+            self.weekLabel.textColor = color
+            self.maxTempLabel.textColor = color
+            self.minTempLabel.textColor = color
+            self.weatherSign.tintColor = color
+        }
     }
 }
 
@@ -91,6 +291,8 @@ private class ZMJRecentTopView: UIView {
 private class ZMJRecentMiddleView: UIView {
     var maxTemps:Array<Int> = []
     var minTemps:Array<Int> = []
+    var maxTemp:Int = 0
+    var minTemp:Int = 0
     
     var maxLineLayer:CAShapeLayer = CAShapeLayer()
     
@@ -111,68 +313,98 @@ private class ZMJRecentMiddleView: UIView {
             maxTemps.append(Int(weather.maxTemp)!)
             minTemps.append(Int(weather.minTemp)!)
         }
+        maxTemp = [minTemps.max()!, maxTemps.max()!].max()!
+        minTemp = [minTemps.min()!, maxTemps.min()!].min()!
         initSublayers()
     }
     
     func initSublayers() {
         // 高温阴影
         maxLineGradientLayer.removeFromSuperlayer()
+        maxLineGradientLayer.colors = [UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor, UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0).cgColor]
+        maxLineGradientLayer.mask = CAShapeLayer.init()
         self.layer.addSublayer(maxLineGradientLayer)
         // 高温线条
         maxLineLayer.removeFromSuperlayer()
+        maxLineLayer.strokeColor = UIColor.white.cgColor
+        maxLineLayer.fillColor = UIColor.clear.cgColor
+        maxLineLayer.lineWidth = 1.5
         self.layer.addSublayer(maxLineLayer)
         // 高温温点
         for pointLayer in maxPointLayers {
             pointLayer.removeFromSuperlayer()
         }
         maxPointLayers = []
-        for _ in -1...maxTemps.count {
-            let pointLayer = CALayer.init()
-            maxPointLayers.append(pointLayer)
-            self.layer.addSublayer(pointLayer)
+        for _ in 0..<maxTemps.count {
+            let pointLayer0 = CALayer.init()
+            pointLayer0.bounds = CGRect.init(x: 0, y: 0, width: 10.0, height: 10.0)
+            pointLayer0.cornerRadius = 5.0;
+            pointLayer0.masksToBounds = true
+            pointLayer0.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor
+            
+            let pointLayer1 = CALayer.init()
+            pointLayer1.bounds = CGRect.init(x: 0, y: 0, width: 5.0, height: 5.0)
+            pointLayer1.cornerRadius = 2.5;
+            pointLayer1.masksToBounds = true
+            pointLayer1.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0).cgColor
+            pointLayer1.position = CGPoint.init(x: 5.0, y: 5.0)
+            pointLayer0.addSublayer(pointLayer1)
+            
+            maxPointLayers.append(pointLayer0)
+            self.layer.addSublayer(pointLayer0)
         }
+        
         // 低温阴影
         minLineGradientLayer.removeFromSuperlayer()
+        minLineGradientLayer.colors = [UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor, UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0).cgColor]
+        minLineGradientLayer.mask = CAShapeLayer.init()
         self.layer.addSublayer(minLineGradientLayer)
         // 低温线条
         minLineLayer.removeFromSuperlayer()
+        minLineLayer.removeFromSuperlayer()
+        minLineLayer.strokeColor = UIColor.white.cgColor
+        minLineLayer.fillColor = UIColor.clear.cgColor
+        minLineLayer.lineWidth = 1.5
         self.layer.addSublayer(minLineLayer)
         // 低温温点
         for pointLayer in minPointLayers {
             pointLayer.removeFromSuperlayer()
         }
         minPointLayers = []
-        for _ in -1...maxTemps.count {
-            let pointLayer = CALayer.init()
-            minPointLayers.append(pointLayer)
-            self.layer.addSublayer(pointLayer)
+        for _ in 0..<maxTemps.count {
+            let pointLayer0 = CALayer.init()
+            pointLayer0.bounds = CGRect.init(x: 0, y: 0, width: 10.0, height: 10.0)
+            pointLayer0.cornerRadius = 5.0;
+            pointLayer0.masksToBounds = true
+            pointLayer0.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor
+            
+            let pointLayer1 = CALayer.init()
+            pointLayer1.bounds = CGRect.init(x: 0, y: 0, width: 5.0, height: 5.0)
+            pointLayer1.cornerRadius = 2.5;
+            pointLayer1.masksToBounds = true
+            pointLayer1.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0).cgColor
+            pointLayer1.position = CGPoint.init(x: 5.0, y: 5.0)
+            pointLayer0.addSublayer(pointLayer1)
+            
+            minPointLayers.append(pointLayer0)
+            self.layer.addSublayer(pointLayer0)
         }
     }
     
     func showTemplines() {
-        draw(minTemps: minTemps, maxTemps: maxTemps, animete: false)
+        draw(minTemps: minTemps, maxTemps: maxTemps, animete: true)
     }
     
     func resetTemplines() {
         var averageMaxTemps:Array<Int> = []
         var averageMinTemps:Array<Int> = []
         
-        var totalMaxValue = 0
-        for value in maxTemps {
-            totalMaxValue = totalMaxValue + value
-        }
-        let averageMaxTemp = totalMaxValue / maxTemps.count
         for _ in 0..<maxTemps.count {
-            averageMaxTemps.append(averageMaxTemp)
+            averageMaxTemps.append(maxTemp - (maxTemp - minTemp) / 3)
         }
         
-        var totalMinValue = 0
-        for value in minTemps {
-            totalMinValue = totalMinValue + value
-        }
-        let averageMinTemp = totalMinValue / minTemps.count
         for _ in 0..<minTemps.count {
-            averageMinTemps.append(averageMinTemp)
+            averageMinTemps.append(minTemp + (maxTemp - minTemp) / 3)
         }
 
         draw(minTemps: averageMinTemps, maxTemps: averageMaxTemps, animete: false)
@@ -180,25 +412,27 @@ private class ZMJRecentMiddleView: UIView {
     
     private func draw(minTemps:Array<Int>, maxTemps:Array<Int>, animete:Bool) {
         if minTemps.count > 0 && maxTemps.count > 0 {
-            let maxTemp:Int = [minTemps.max()!, maxTemps.max()!].max()!
-            let minTemp:Int = [minTemps.min()!, maxTemps.min()!].min()!
             
-            let yPadding:CGFloat = self.frame.height * 0.3333 / 3
-            let perHeight:CGFloat = self.frame.height * 0.6666 / CGFloat(maxTemp - minTemp)
-            let xPadding:CGFloat = self.frame.width / CGFloat(maxTemps.count * 2)
-            let itemPadding:CGFloat = self.frame.width / CGFloat(maxTemps.count)
+            let yPadding:Float = Float(self.frame.height * 0.3333 / 2.0)
+            let perHeight:Float = Float(self.frame.height * 0.6666 / CGFloat(maxTemp - minTemp))
+            let xPadding:Float = Float(self.frame.width / CGFloat(maxTemps.count * 2))
+            let itemPadding:Float = Float(self.frame.width) / Float(maxTemps.count)
             
             // 计算最高温度点坐标
             var maxPoints:Array<CGPoint> = []
             for index in 0..<maxTemps.count {
-                let point:CGPoint = CGPoint.init(x: xPadding + itemPadding * CGFloat(index), y: yPadding + perHeight * CGFloat((maxTemp - maxTemps[index])))
+                var point:CGPoint = CGPoint.init()
+                point.x = CGFloat((xPadding + itemPadding * Float(index)))
+                point.y = CGFloat((yPadding + perHeight * Float((maxTemp - maxTemps[index]))))
                 maxPoints.append(point)
             }
             
             // 计算最低温度点坐标
             var minPoints:Array<CGPoint> = []
             for index in 0..<minTemps.count {
-                let point:CGPoint = CGPoint.init(x: xPadding + itemPadding * CGFloat(index), y: yPadding + perHeight * CGFloat((maxTemp - minTemps[index])))
+                var point:CGPoint = CGPoint.init()
+                point.x = CGFloat((xPadding + itemPadding * Float(index)))
+                point.y = CGFloat((yPadding + perHeight * Float((maxTemp - minTemps[index]))))
                 minPoints.append(point)
             }
 
@@ -216,18 +450,8 @@ private class ZMJRecentMiddleView: UIView {
                 return point1.y < point2.y
             })!
             let minShadowEndPoint:CGPoint = CGPoint.init(x: 0, y: self.frame.height)
-            self.drawTempPoints(points: minPoints, startShadowPoint: minShadowStartPoint, endShadowPoint: minShadowEndPoint, max: true, animate: animete)
+            self.drawTempPoints(points: minPoints, startShadowPoint: minShadowStartPoint, endShadowPoint: minShadowEndPoint, max: false, animate: animete)
         }
-    }
-    
-    func createShadowLayer() -> CALayer {
-        let shadowLayer = CALayer()
-        shadowLayer.shadowColor = UIColor.black.cgColor
-        shadowLayer.shadowOffset = CGSize.init(width: 0, height: 5.0)
-        shadowLayer.shadowRadius = 5.0
-        shadowLayer.shadowOpacity = 1.0
-        shadowLayer.backgroundColor = UIColor.clear.cgColor
-        return shadowLayer
     }
     
     func convert(points:Array<CGPoint>, toFrame:CGRect) -> Array<CGPoint> {
@@ -241,7 +465,7 @@ private class ZMJRecentMiddleView: UIView {
         return newPoints
     }
     
-    func createCurveLine(points:Array<CGPoint>) -> UIBezierPath {
+    func createCurveLinePath(points:Array<CGPoint>) -> UIBezierPath {
         
         let path = UIBezierPath.init()
         path.move(to: points.first!)
@@ -294,60 +518,69 @@ private class ZMJRecentMiddleView: UIView {
     func drawTempPoints(points:Array<CGPoint>, startShadowPoint:CGPoint, endShadowPoint:CGPoint, max:Bool, animate:Bool) {
         var tempPoint = points
         
+        // 温度点位置
+        for (index, pointLayer) in (max ? maxPointLayers : minPointLayers).enumerated() {
+            if animate {
+                let lineAnimate = CABasicAnimation.init(keyPath: "position")
+                lineAnimate.fromValue = pointLayer.position
+                lineAnimate.toValue = tempPoint[index]
+                lineAnimate.duration = 0.25
+                lineAnimate.fillMode = kCAFillModeForwards;
+                lineAnimate.isRemovedOnCompletion = false
+                pointLayer.add(lineAnimate, forKey: "position")
+            } else {
+                pointLayer.removeAnimation(forKey: "position")
+                pointLayer.position = tempPoint[index]
+            }
+        }
+        
+        // 温度线条
+        tempPoint.insert(CGPoint.init(x: 0, y: tempPoint.first!.y), at: 0)
+        tempPoint.append(CGPoint.init(x: self.frame.width, y: tempPoint.last!.y))
+        
+        let tempLinePath = createCurveLinePath(points: tempPoint)
+        let tempLineLayer = max ? maxLineLayer : minLineLayer
+        
+        
         if animate {
-            tempPoint.insert(CGPoint.init(x: 0, y: tempPoint.first!.y), at: 0)
-            tempPoint.append(CGPoint.init(x: self.frame.width, y: tempPoint.last!.y))
+            let lineAnimate = CABasicAnimation.init(keyPath: "path")
+            lineAnimate.fromValue = tempLineLayer.path
+            lineAnimate.toValue = tempLinePath.cgPath
+            lineAnimate.duration = 0.25
+            lineAnimate.fillMode = kCAFillModeForwards;
+            lineAnimate.isRemovedOnCompletion = false
+            tempLineLayer.add(lineAnimate, forKey: "path")
         } else {
-            tempPoint.insert(CGPoint.init(x: 0, y: tempPoint.first!.y), at: 0)
-            tempPoint.append(CGPoint.init(x: self.frame.width, y: tempPoint.last!.y))
+            tempLineLayer.removeAnimation(forKey: "path")
+            tempLineLayer.path = tempLinePath.cgPath
         }
         
-        // 画温度线
-        let maxTempLine = createCurveLine(points: tempPoint)
-        let maxTempLayer = CAShapeLayer()
-        maxTempLayer.path = maxTempLine.cgPath
-        maxTempLayer.strokeColor = UIColor.white.cgColor
-        maxTempLayer.fillColor = UIColor.clear.cgColor
-        maxTempLayer.lineWidth = 1.5
-        self.layer.addSublayer(maxTempLayer)
         
-        if max {
-            // 画温度线阴影
-            let shadowGradientLayer = CAGradientLayer.init()
-            shadowGradientLayer.colors = [UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor, UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0).cgColor]
-            shadowGradientLayer.frame = CGRect.init(x: 0, y: startShadowPoint.y, width: self.frame.width, height: endShadowPoint.y - startShadowPoint.y)
-            
-            let gradietPoints = convert(points: tempPoint, toFrame: shadowGradientLayer.frame)
-            let gradietPath = createCurveLine(points: gradietPoints)
-            gradietPath.addLine(to: CGPoint.init(x: shadowGradientLayer.frame.width, y: shadowGradientLayer.frame.height))
-            gradietPath.addLine(to: CGPoint.init(x: 0, y: shadowGradientLayer.frame.height))
-            gradietPath.close()
-            let maskShadowMask = CAShapeLayer.init()
-            maskShadowMask.path = gradietPath.cgPath
-            shadowGradientLayer.mask = maskShadowMask
-            
-            self.layer.insertSublayer(shadowGradientLayer, below: maxTempLayer)
+        
+        
+        // 温度线阴影
+        let tempLineShadowLayer = max ? maxLineGradientLayer : minLineGradientLayer
+        tempLineShadowLayer.frame = CGRect.init(x: 0, y: startShadowPoint.y, width: self.frame.width, height: endShadowPoint.y - startShadowPoint.y)
+        let gradietPoints = convert(points: tempPoint, toFrame: tempLineShadowLayer.frame)
+        let gradietPath = createCurveLinePath(points: gradietPoints)
+        gradietPath.addLine(to: CGPoint.init(x: tempLineShadowLayer.frame.width, y: tempLineShadowLayer.frame.height))
+        gradietPath.addLine(to: CGPoint.init(x: 0, y: tempLineShadowLayer.frame.height))
+        gradietPath.close()
+        
+        let shadowMaskLayer:CAShapeLayer = tempLineShadowLayer.mask as! CAShapeLayer
+        if animate {
+            let shadowAnimate = CABasicAnimation.init(keyPath: "path")
+            shadowAnimate.fromValue = shadowMaskLayer.path
+            shadowAnimate.toValue = gradietPath.cgPath
+            shadowAnimate.duration = 0.25
+            shadowAnimate.fillMode = kCAFillModeForwards;
+            shadowAnimate.isRemovedOnCompletion = false
+            shadowMaskLayer.add(shadowAnimate, forKey: "path")
+        } else {
+            shadowMaskLayer.removeAnimation(forKey: "path")
+            shadowMaskLayer.path = gradietPath.cgPath
         }
         
-        // 画温度点
-        for index in 1..<tempPoint.count-1 {
-            let layer0 = CALayer.init()
-            layer0.bounds = CGRect.init(x: 0, y: 0, width: 10.0, height: 10.0)
-            layer0.cornerRadius = 5.0;
-            layer0.masksToBounds = true
-            layer0.position = tempPoint[index]
-            layer0.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5).cgColor
-            
-            let layer1 = CALayer.init()
-            layer1.bounds = CGRect.init(x: 0, y: 0, width: 5.0, height: 5.0)
-            layer1.cornerRadius = 2.5;
-            layer1.masksToBounds = true
-            layer1.position = CGPoint.init(x: 5.0, y: 5.0)
-            layer1.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0).cgColor
-            layer0.addSublayer(layer1)
-            
-            self.layer.addSublayer(layer0)
-        }
     }
     
     private func ControlPointForTheBezierCanThrough3Point(point1:CGPoint, point2:CGPoint, point3:CGPoint) -> CGPoint {

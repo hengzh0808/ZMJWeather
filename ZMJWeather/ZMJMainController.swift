@@ -45,7 +45,7 @@ class ZMJTabbar: UITabBar, UITabBarDelegate {
     
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         var size = super.sizeThatFits(size)
-        size.height = 65
+        size.height = 69.5
         return size
     }
     

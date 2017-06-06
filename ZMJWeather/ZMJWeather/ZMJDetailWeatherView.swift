@@ -133,7 +133,8 @@ private class DetailWeatherView: UIView {
         didSet {
             tempLable.text = weather.nowTemp + tempSign
             weatherLabel.text = weather.weatherText
-            weatherSign.image = UIImage.init(named: "weather" + weather.weatherCode + "_icon")
+            weatherSign.image = UIImage.init(named: "weather" + weather.weatherCode + "_icon")?.withRenderingMode(.alwaysTemplate)
+            weatherSign.tintColor = UIColor.white
             maxTempLabel.text = upArrow + weather.maxTemp + tempSign
             minTempLabel.text = downArrow + weather.minTemp + tempSign
             
@@ -148,8 +149,6 @@ private class DetailWeatherView: UIView {
             
             dateLable.text = months[month - 1] + "月" + String(day) + "日"
             weekLabel.text = week
-            
-            weatherSign.image = UIImage.init(named: "weather" + weather.weatherCode + "_icon")
     
             aqiView.isHidden = false
             aqiLable.text = weather.pm25
@@ -168,10 +167,6 @@ private class DetailWeatherView: UIView {
             }
         }
     }
-    
-    let upArrow = "↑"
-    let downArrow = "↓"
-    let tempSign = "°"
     
     override init(frame: CGRect) {
         super.init(frame: frame)

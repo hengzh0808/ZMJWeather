@@ -40,7 +40,7 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        recentWeatherView.frame = CGRect.init(x: 0.0, y: self.view.frame.height - 85.0, width: self.view.frame.width, height: self.view.frame.height * 0.63)
+        recentWeatherView.frame = CGRect.init(x: 0.0, y: self.view.frame.height - 85.0, width: self.view.frame.width, height: (self.view.frame.height > 667 ? 667 : self.view.frame.height) * 0.63)
     }
     
     // MARK:自定义方法
@@ -65,7 +65,6 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
         panGesture.delegate = self
         recentWeatherView.backgroundColor = UIColor.red
         recentWeatherView.addGestureRecognizer(panGesture)
-//        recentWeatherView.addObserver(self, forKeyPath: "frame", options: [NSKeyValueObservingOptions.new, NSKeyValueObservingOptions.old], context: nil)
         self.view.addSubview(recentWeatherView)
     }
     
@@ -104,6 +103,12 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
         } else {
             recentWeatherView.frame = CGRect.init(x: 0.0, y:recentWeatherView.frame.minY + offset.y, width: self.view.frame.width, height: recentWeatherView.frame.height)
         }
+        
+        let distance = recentWeatherView.frame.height - 85
+        let offsetDistance =  (recentWeatherView.frame.height - 85) - (recentWeatherView.frame.maxY - self.view.frame.maxY)
+        let offsetRatio = offsetDistance / distance
+        recentWeatherView.set(offsetRatio: Float(offsetRatio))
+        
         switch panGesture.state {
         case UIGestureRecognizerState.ended,UIGestureRecognizerState.cancelled,UIGestureRecognizerState.failed:
             animateRecentView(velocity: panGesture.velocity(in: recentWeatherView))
@@ -136,16 +141,16 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
                 detailWeatherView.animteWeatherView(top: true)
             }
         }
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: 0.25) { 
             self.recentWeatherView.frame = frame
-        }) { (result) in
-            if self.recentWeatherView.frame.minY == (self.view.frame.height - 85.0) {
-                self.detailWeatherView.bounces = true
-//                self.recentWeatherView.resetTemplines()
-            } else {
-                self.detailWeatherView.bounces = false
-//                self.recentWeatherView.showTemplines()
-            }
+        }
+        if frame.minY == (self.view.frame.height - 85.0) {
+            self.detailWeatherView.bounces = true
+            self.recentWeatherView.resetRecentDetails()
+        } else {
+            self.detailWeatherView.bounces = false
+            self.recentWeatherView.showRecentDetails()
+            
         }
     }
 }
