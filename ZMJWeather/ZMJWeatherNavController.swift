@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ZMJWeatherNavController: UINavigationController {
+class ZMJWeatherNavController: UINavigationController, UIGestureRecognizerDelegate, UINavigationControllerDelegate {
     var locationController:ZMJEditLocationController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ZMJEditLocationController") as! ZMJEditLocationController
     private var locationShow:Bool = false
     
@@ -17,6 +17,8 @@ class ZMJWeatherNavController: UINavigationController {
         self.view.backgroundColor = UIColor.red
         self.viewControllers.insert(locationController, at: 0)
         self.view.insertSubview(locationController.view, at: 0)
+//        self.interactivePopGestureRecognizer?.delegate = self
+//        self.delegate = self;
     }
     
     func showEditLocation(complete: ((_ show:Bool)-> Void)!) {
@@ -30,6 +32,41 @@ class ZMJWeatherNavController: UINavigationController {
         }) { (result) in
             print("")
         }
+    }
+    
+    override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+        self.interactivePopGestureRecognizer?.isEnabled = false
+        super.pushViewController(viewController, animated: animated)
+    }
+    
+    
+    override func popViewController(animated: Bool) -> UIViewController? {
+        self.interactivePopGestureRecognizer?.isEnabled = false
+        return super.popViewController(animated: animated)
+    }
+    
+    override func popToRootViewController(animated: Bool) -> [UIViewController]? {
+        self.interactivePopGestureRecognizer?.isEnabled = false
+        return super.popToRootViewController(animated: animated)
+    }
+    
+    override func popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
+        return super.popToViewController(viewController, animated: animated)
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        if self.viewControllers.count > 1 {
+            self.interactivePopGestureRecognizer?.isEnabled = true;
+        } else {
+            self.interactivePopGestureRecognizer?.isEnabled = false;
+        }
+    }
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if self.viewControllers.count == 1 {
+            return false
+        }
+        return true
     }
     
     func showViewControllerFromBelow(viewController: UIViewController) {

@@ -8,6 +8,7 @@
 
 import UIKit
 import PromiseKit
+import FMDB
 
 @objc class LocationInfo:NSObject {
     var latitude:Double!
@@ -30,7 +31,25 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
     
     private let locationTool:AMapLocationManager = AMapLocationManager.init()
     private let searchTool:AMapSearchAPI = AMapSearchAPI.init()
-    private var locationRequset: (requset: AMapGeocodeSearchRequest, fulfill: (Array<LocationInfo>) -> Void, reject: (Error) -> Void)!
+    private var locationRequset: Dictionary<AMapGeocodeSearchRequest, (fulfill: (Array<LocationInfo>) -> Void, reject: (Error) -> Void)> = Dictionary.init()
+    private var dbQueue:FMDatabaseQueue!
+    
+    override init() {
+        super.init()
+        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
+        dbQueue = FMDatabaseQueue.init(path: path?.appending("/weather.sqlite"))
+        dbQueue.inDatabase { (db) in
+            do {
+                // 地理位置表
+                try db.executeUpdate("create table if not exists location(latitude float, longitude float, province text, city text, district text)", values: nil)
+            } catch {}
+            
+            do {
+                // 天气信息
+                try db.executeUpdate("create table if not exists weather(weather text)", values: nil)
+            } catch {}
+        }
+    }
     
     func updateLocation() -> Promise<LocationInfo>  {
         locationTool.desiredAccuracy = kCLLocationAccuracyHundredMeters
@@ -63,13 +82,13 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         let request = AMapGeocodeSearchRequest()
         request.address = address
         searchTool.aMapGeocodeSearch(request)
-        locationRequset = (request, fulfill, reject)
+        locationRequset.updateValue((fulfill, reject), forKey: request)
         return promise
     }
     
     func onGeocodeSearchDone(_ request: AMapGeocodeSearchRequest!, response: AMapGeocodeSearchResponse!) {
-        let (requset, fulfill, reject) = locationRequset
-        if request == requset {
+        if locationRequset[request] != nil {
+            let (fulfill, reject) = locationRequset[request]!
             if response.count > 0 {
                 var locations:Array<LocationInfo> = []
                 for geocode in response.geocodes {
@@ -89,7 +108,23 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
             } else {
                 reject(NSError.init(domain: "没有搜索结果", code: 9999, userInfo: nil))
             }
+            locationRequset.removeValue(forKey: request)
         }
+    }
+    
+    func save(location:LocationInfo) -> Promise<Bool> {
+        let (promise, fulfill, reject) = Promise<Bool>.pending()
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.dbQueue.inDatabase { (db) in
+                do {
+                    try db.executeUpdate("insert into location values(?,?,?,?,?)", values: [location.latitude ?? "", location.longitude ?? 0.0, location.province ?? 0.0, location.city ?? "", location.district ?? ""])
+                    fulfill(true)
+                } catch {
+                    reject(error)
+                }
+            }
+        }
+        return promise
     }
     
     func addObserver(start:@escaping AddressHandlerStart, success:@escaping AddressHandlerSuccess, error:@escaping AddressHandlerError) -> Void {

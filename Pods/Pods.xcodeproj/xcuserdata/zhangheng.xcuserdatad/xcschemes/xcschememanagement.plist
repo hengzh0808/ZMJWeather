@@ -49,6 +49,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>SVProgressHUD.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>SnapKit.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -62,32 +67,22 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>02F8402C7F0D517841154C7814E5CCB7</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>1779FF6F4B52801AAD666F04FD1E8545</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 		<key>251BAD17812F7EBF6532EACF66F941C3</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>491656A4F705B349D8065ED875D21036</key>
+		<key>34B60328AD926AC819BA118FAA3A8420</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>68F481444CEF5DAB53399EA94450E8FA</key>
+		<key>5F5F34179CA98B1A4A5B487A3C159289</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>84E3919D8D2DEA1C666AFFF25E4B44EF</key>
+		<key>828D476A7593BA62FD85206FCC38205B</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -97,12 +92,27 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>9C8C4EF96024E7358BAB29C305D71994</key>
+		<key>AA010B811C523CBC4C218A786989C0EB</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B58881CE2725DAAAC1224B217D4AFE1C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
 		<key>C5A2DB7A84B7B78E359870D2E1B24AA7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>D262274F393638C3995F7EA4A7135BE6</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E04C43C403D1ECAF47F1C58162F09F77</key>
 		<dict>
 			<key>primary</key>
 			<true/>

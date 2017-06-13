@@ -9,6 +9,7 @@
 import UIKit
 import RxCocoa
 import SnapKit
+import PromiseKit
 
 class ZMJAddLocationController: UIViewController {
 
@@ -124,7 +125,6 @@ class ZMJAddLocationController: UIViewController {
     
     func addLocationViews() {
         removeLocations();
-        
         for (index, location) in locations.enumerated() {
             let row = index / 5
             let col = index % 5
@@ -132,6 +132,15 @@ class ZMJAddLocationController: UIViewController {
             button.setTitle(location, for: .normal)
             button.setTitleColor(Color115, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
+            _ = button.rx.tap.asControlEvent().subscribe(onNext: { () in
+                locationManager.search(address: location).then(execute: { (infos) -> Promise<Bool> in
+                    return locationManager.save(location: infos.first!)
+                }).then(execute: { (result) -> Void in
+                    print("")
+                }).catch(execute: { (error) in
+                    print("")
+                })
+            })
             dataViews.append(button)
             self.view.addSubview(button)
             button.snp.makeConstraints({ (make) in

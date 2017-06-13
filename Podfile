@@ -12,4 +12,5 @@ target ‘ZMJWeather’ do
     pod 'AMapSearch-NO-IDFA'
     pod 'FSCalendar'
     pod 'FMDB'
+    pod 'SVProgressHUD'
 end
