@@ -1,16 +1,20 @@
 PODS:
   - Alamofire (4.4.0)
-  - Charts (3.0.2):
-    - Charts/Core (= 3.0.2)
-  - Charts/Core (3.0.2)
+  - AMapFoundation-NO-IDFA (1.4.0)
+  - AMapLocation-NO-IDFA (2.4.0):
+    - AMapFoundation-NO-IDFA (~> 1.4)
+  - AMapSearch-NO-IDFA (5.1.0):
+    - AMapFoundation-NO-IDFA (~> 1.2)
   - DateToolsSwift (2.0.3)
+  - FMDB (2.7.2):
+    - FMDB/standard (= 2.7.2)
+  - FMDB/standard (2.7.2)
+  - FSCalendar (2.7.8)
   - MJRefresh (3.1.12)
   - PromiseKit (4.2.2):
     - PromiseKit/Foundation (= 4.2.2)
     - PromiseKit/QuartzCore (= 4.2.2)
     - PromiseKit/UIKit (= 4.2.2)
-  - PromiseKit/CoreLocation (4.2.2):
-    - PromiseKit/CorePromise
   - PromiseKit/CorePromise (4.2.2)
   - PromiseKit/Foundation (4.2.2):
     - PromiseKit/CorePromise
@@ -26,19 +30,25 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
-  - Charts
+  - AMapLocation-NO-IDFA
+  - AMapSearch-NO-IDFA
   - DateToolsSwift (~> 2.0.3)
+  - FMDB
+  - FSCalendar
   - MJRefresh
   - PromiseKit (~> 4.2.2)
-  - PromiseKit/CoreLocation
   - RxCocoa
   - SnapKit
   - SwiftyJSON
 
 SPEC CHECKSUMS:
   Alamofire: dc44b1600b800eb63da6a19039a0083d62a6a62d
-  Charts: 236d6ccdd0ce6feae151d89e829a7397381a21fd
+  AMapFoundation-NO-IDFA: d1ba541a56737c2048115a745b1dfcbe9901c248
+  AMapLocation-NO-IDFA: 9493012d3241a7d551942c7c1e1069b51f295083
+  AMapSearch-NO-IDFA: 06085cfcce8862531c16d5dfbe87f7152ce27dac
   DateToolsSwift: bf69bf9056d9e53c5c03f06e51f219b9b8b02f9e
+  FMDB: 6198a90e7b6900cfc046e6bc0ef6ebb7be9236aa
+  FSCalendar: 09369a2bf554ba71cd8e8cfb627e2df22a2c2af4
   MJRefresh: b96cdb21c4aa75a7b07654311ab2f315c497e806
   PromiseKit: 00e8886881f151c7e573d06b437915b0bb2970ec
   RxCocoa: a0a09f45d0e5b48ecb6a4a7b4b4c89c88d3f633f
@@ -46,6 +56,6 @@ SPEC CHECKSUMS:
   SnapKit: 1ca44df72cfa543218d177cb8aab029d10d86ea7
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
 
-PODFILE CHECKSUM: f8efcf7a18009a4e9d5a13824bf05c891eefca89
+PODFILE CHECKSUM: 9095402d055b761e58530f55aa5dba575b20e5fc
 
 COCOAPODS: 1.2.1

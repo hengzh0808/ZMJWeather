@@ -7,14 +7,14 @@
 //
 
 import UIKit
-import CoreLocation
 import PromiseKit
 
 @objc class LocationInfo:NSObject {
     var latitude:Double!
     var longitude:Double!
-    var locality:String!
-    var subLocality:String!
+    var province:String! // 省
+    var city:String! // 市
+    var district:String! // 区
 }
 
 typealias AddressHandlerStart = @convention(block) () -> Void
@@ -22,28 +22,74 @@ typealias AddressHandlerSuccess = @convention(block) (LocationInfo) -> Void
 typealias AddressHandlerError = @convention(block) (String) -> Void
 
 let locationManager:ZMJLocationManager = ZMJLocationManager.init()
-class ZMJLocationManager: NSObject {
+class ZMJLocationManager: NSObject, AMapSearchDelegate {
     
     private var startHandlers:NSMutableArray = NSMutableArray.init()
     private var successHandlers:NSMutableArray = NSMutableArray.init()
     private var errorHandlers:NSMutableArray = NSMutableArray.init()
     
+    private let locationTool:AMapLocationManager = AMapLocationManager.init()
+    private let searchTool:AMapSearchAPI = AMapSearchAPI.init()
+    private var locationRequset: (requset: AMapGeocodeSearchRequest, fulfill: (Array<LocationInfo>) -> Void, reject: (Error) -> Void)!
+    
     func updateLocation() -> Promise<LocationInfo>  {
+        locationTool.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationTool.locationTimeout = 5
+        locationTool.reGeocodeTimeout = 5
         
-        return Promise.init(resolvers: { (resolve, reject) in
-            CLLocationManager.promise().then { (location) -> Promise<CLPlacemark> in
-                return CLGeocoder().reverseGeocode(location: location)
-            }.then { (address) -> Void in
-                let locationInfo:LocationInfo = LocationInfo.init()
-                locationInfo.locality = address.locality!
-                locationInfo.subLocality = address.subLocality!
-                locationInfo.longitude = address.location?.coordinate.longitude
-                locationInfo.latitude = address.location?.coordinate.latitude
-                resolve(locationInfo)
-            }.catch { (error) in
-                reject(error)
+        let (promise, fulfill, reject) = Promise<LocationInfo>.pending()
+        
+        locationTool.requestLocation(withReGeocode: true) { (location, reGeocode, error) in
+            if let error = error {
+                reject(error as NSError)
             }
-        })
+            let locationInfo:LocationInfo = LocationInfo.init()
+            if let location = location {
+                locationInfo.latitude = location.coordinate.latitude
+                locationInfo.longitude = location.coordinate.longitude
+            }
+            if let reGeocode = reGeocode {
+                locationInfo.city = reGeocode.city
+                locationInfo.district = reGeocode.district
+            }
+            fulfill(locationInfo)
+        }
+        return promise
+    }
+    
+    func search(address:String) -> Promise<Array<LocationInfo>> {
+        searchTool.delegate = self
+        let (promise, fulfill, reject) = Promise<Array<LocationInfo>>.pending()
+        let request = AMapGeocodeSearchRequest()
+        request.address = address
+        searchTool.aMapGeocodeSearch(request)
+        locationRequset = (request, fulfill, reject)
+        return promise
+    }
+    
+    func onGeocodeSearchDone(_ request: AMapGeocodeSearchRequest!, response: AMapGeocodeSearchResponse!) {
+        let (requset, fulfill, reject) = locationRequset
+        if request == requset {
+            if response.count > 0 {
+                var locations:Array<LocationInfo> = []
+                for geocode in response.geocodes {
+                    let locationInfo = LocationInfo.init()
+                    locationInfo.province = (geocode.province != nil && (geocode.province as NSString).length > 0) ? geocode.province : nil
+                    locationInfo.city = (geocode.city != nil && (geocode.city as NSString).length > 0) ? geocode.city : nil
+                    locationInfo.district = (geocode.district != nil && (geocode.district as NSString).length > 0) ? geocode.district : nil
+                    locationInfo.latitude = Double(geocode.location.latitude)
+                    locationInfo.longitude = Double(geocode.location.longitude)
+                    locations.append(locationInfo)
+                }
+                if locations.count > 0 {
+                    fulfill(locations)
+                } else {
+                    reject(NSError.init(domain: "没有搜索结果", code: 9999, userInfo: nil))
+                }
+            } else {
+                reject(NSError.init(domain: "没有搜索结果", code: 9999, userInfo: nil))
+            }
+        }
     }
     
     func addObserver(start:@escaping AddressHandlerStart, success:@escaping AddressHandlerSuccess, error:@escaping AddressHandlerError) -> Void {

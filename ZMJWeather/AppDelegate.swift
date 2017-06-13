@@ -15,8 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         ZMJTabbar.customeappearance()
-//        AMapServices.shared().enableHTTPS = true
-//        AMapServices.shared().apiKey = "27865b3ebbe07c88029ea5036ebb40aa"
+        AMapServices.shared().enableHTTPS = true
+        AMapServices.shared().apiKey = "27865b3ebbe07c88029ea5036ebb40aa"
         return true
     }
 

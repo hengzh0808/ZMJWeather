@@ -7,21 +7,28 @@
 //
 
 import UIKit
+import FSCalendar
 
 class ZMJCalenderController: UIViewController {
 
+//    @IBOutlet weak var topBarView: UIView!
+    @IBOutlet weak var calenderView: FSCalendar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+//        topBarView.layer.shadowOffset = CGSize.init(width: 0, height: 1)
+//        topBarView.backgroundColor = UIColor.white
+//        topBarView.layer.shadowColor = UIColor.white.cgColor
+//        topBarView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+//        topBarView.layer.shadowRadius = 2.0
+//        topBarView.layer.shadowOpacity = 1.0
+        
+        calenderView.scrollDirection = FSCalendarScrollDirection.vertical
+        calenderView.pagingEnabled = false; // important
     }
     
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIStatusBarStyle.lightContent
+        return UIStatusBarStyle.default
     }
 }

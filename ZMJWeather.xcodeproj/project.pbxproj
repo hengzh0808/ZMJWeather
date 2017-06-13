@@ -8,41 +8,51 @@
 
 /* Begin PBXBuildFile section */
 		46F0C9CAC5BE925F00B249D2 /* Pods_ZMJWeather.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A3DF20334AD6DF8128D036B /* Pods_ZMJWeather.framework */; };
-		7E43E6B61EE14AE5003DD89D /* ZMJWeatherStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E43E6B51EE14AE5003DD89D /* ZMJWeatherStruct.swift */; };
 		7E7D2BD51ED9F4E2002C27DC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7D2BD41ED9F4E2002C27DC /* AppDelegate.swift */; };
 		7E7D2BDA1ED9F4E2002C27DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E7D2BD81ED9F4E2002C27DC /* Main.storyboard */; };
 		7E7D2BDC1ED9F4E2002C27DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E7D2BDB1ED9F4E2002C27DC /* Assets.xcassets */; };
-		7E893F5A1EDB42260097827A /* ZMJMainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E893F591EDB42260097827A /* ZMJMainController.swift */; };
-		7EA46C931EDFB1590004AC4F /* ZMJDetailWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA46C921EDFB1590004AC4F /* ZMJDetailWeatherView.swift */; };
+		7E893F5A1EDB42260097827A /* ZMJWeatherTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E893F591EDB42260097827A /* ZMJWeatherTabController.swift */; };
 		7EA46C991EDFEE380004AC4F /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7EA46C981EDFEE380004AC4F /* Launch Screen.storyboard */; };
 		7EB825941EE4069B00D9A937 /* ZMJConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EB825931EE4069B00D9A937 /* ZMJConstant.swift */; };
-		7EE86FBB1EDF2845009518FA /* ZMJRecentWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE86FB91EDF2845009518FA /* ZMJRecentWeatherView.swift */; };
-		7EE86FBC1EDF2845009518FA /* ZMJWeaterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE86FBA1EDF2845009518FA /* ZMJWeaterController.swift */; };
+		7EC27DCB1EEE759D00F13AB2 /* ZMJDetailWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DC51EEE759C00F13AB2 /* ZMJDetailWeatherView.swift */; };
+		7EC27DCC1EEE759D00F13AB2 /* ZMJRecentWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DC61EEE759C00F13AB2 /* ZMJRecentWeatherView.swift */; };
+		7EC27DCD1EEE759D00F13AB2 /* ZMJWeatherStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DC81EEE759D00F13AB2 /* ZMJWeatherStruct.swift */; };
+		7EC27DCE1EEE759D00F13AB2 /* ZMJWeaterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DCA1EEE759D00F13AB2 /* ZMJWeaterController.swift */; };
+		7EC27DD31EEE75E100F13AB2 /* ZMJEditLocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DD21EEE75E100F13AB2 /* ZMJEditLocationController.swift */; };
+		7EC27DD71EEE85A600F13AB2 /* ZMJWeatherNavController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DD61EEE85A600F13AB2 /* ZMJWeatherNavController.swift */; };
+		7EC27DD91EEE89FB00F13AB2 /* ZMJAddLocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DD81EEE89FB00F13AB2 /* ZMJAddLocationController.swift */; };
+		7EC27DDB1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DDA1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift */; };
 		7EE86FC21EDF2879009518FA /* ZMJLocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE86FBE1EDF2879009518FA /* ZMJLocationManager.swift */; };
 		7EE86FC31EDF2879009518FA /* ZMJNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE86FBF1EDF2879009518FA /* ZMJNet.swift */; };
 		7EE86FC41EDF2879009518FA /* ZMJCalenderController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE86FC11EDF2879009518FA /* ZMJCalenderController.swift */; };
+		7EFB57ED1EEF91C6001AC574 /* Address.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7EFB57EC1EEF91C6001AC574 /* Address.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		042EE8816D329B59545CC86A /* Pods-ZMJWeather.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZMJWeather.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ZMJWeather/Pods-ZMJWeather.debug.xcconfig"; sourceTree = "<group>"; };
 		3A3DF20334AD6DF8128D036B /* Pods_ZMJWeather.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZMJWeather.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E1D4CD01EE444880069758A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
-		7E43E6B51EE14AE5003DD89D /* ZMJWeatherStruct.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherStruct.swift; sourceTree = "<group>"; };
 		7E7D2BD11ED9F4E2002C27DC /* ZMJWeather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZMJWeather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E7D2BD41ED9F4E2002C27DC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E7D2BD91ED9F4E2002C27DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7E7D2BDB1ED9F4E2002C27DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E7D2BE01ED9F4E2002C27DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7E893F591EDB42260097827A /* ZMJMainController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJMainController.swift; sourceTree = "<group>"; };
-		7EA46C921EDFB1590004AC4F /* ZMJDetailWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJDetailWeatherView.swift; sourceTree = "<group>"; };
+		7E893F591EDB42260097827A /* ZMJWeatherTabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherTabController.swift; sourceTree = "<group>"; };
 		7EA46C941EDFE6B20004AC4F /* ZMJWeather-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZMJWeather-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EA46C981EDFEE380004AC4F /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		7EB825931EE4069B00D9A937 /* ZMJConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJConstant.swift; sourceTree = "<group>"; };
-		7EE86FB91EDF2845009518FA /* ZMJRecentWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJRecentWeatherView.swift; sourceTree = "<group>"; };
-		7EE86FBA1EDF2845009518FA /* ZMJWeaterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeaterController.swift; sourceTree = "<group>"; };
+		7EC27DC51EEE759C00F13AB2 /* ZMJDetailWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJDetailWeatherView.swift; sourceTree = "<group>"; };
+		7EC27DC61EEE759C00F13AB2 /* ZMJRecentWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJRecentWeatherView.swift; sourceTree = "<group>"; };
+		7EC27DC81EEE759D00F13AB2 /* ZMJWeatherStruct.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherStruct.swift; sourceTree = "<group>"; };
+		7EC27DCA1EEE759D00F13AB2 /* ZMJWeaterController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeaterController.swift; sourceTree = "<group>"; };
+		7EC27DD21EEE75E100F13AB2 /* ZMJEditLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJEditLocationController.swift; sourceTree = "<group>"; };
+		7EC27DD61EEE85A600F13AB2 /* ZMJWeatherNavController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherNavController.swift; sourceTree = "<group>"; };
+		7EC27DD81EEE89FB00F13AB2 /* ZMJAddLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJAddLocationController.swift; sourceTree = "<group>"; };
+		7EC27DDA1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJLocationLabel.swift; sourceTree = "<group>"; };
 		7EE86FBE1EDF2879009518FA /* ZMJLocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJLocationManager.swift; sourceTree = "<group>"; };
 		7EE86FBF1EDF2879009518FA /* ZMJNet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJNet.swift; sourceTree = "<group>"; };
 		7EE86FC11EDF2879009518FA /* ZMJCalenderController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJCalenderController.swift; sourceTree = "<group>"; };
+		7EFB57EC1EEF91C6001AC574 /* Address.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Address.plist; sourceTree = "<group>"; };
 		C2F6E8D06D14B10C138753A5 /* Pods-ZMJWeather.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZMJWeather.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZMJWeather/Pods-ZMJWeather.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,7 +101,8 @@
 				7EE86FC01EDF2879009518FA /* ZMJCalender */,
 				7EE86FB81EDF2845009518FA /* ZMJWeather */,
 				7E7D2BD41ED9F4E2002C27DC /* AppDelegate.swift */,
-				7E893F591EDB42260097827A /* ZMJMainController.swift */,
+				7E893F591EDB42260097827A /* ZMJWeatherTabController.swift */,
+				7EC27DD61EEE85A600F13AB2 /* ZMJWeatherNavController.swift */,
 				7E7D2BD81ED9F4E2002C27DC /* Main.storyboard */,
 				7EA46C981EDFEE380004AC4F /* Launch Screen.storyboard */,
 				7E7D2BDB1ED9F4E2002C27DC /* Assets.xcassets */,
@@ -101,13 +112,40 @@
 			path = ZMJWeather;
 			sourceTree = "<group>";
 		};
+		7EC27DC41EEE759C00F13AB2 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7EC27DC51EEE759C00F13AB2 /* ZMJDetailWeatherView.swift */,
+				7EC27DC61EEE759C00F13AB2 /* ZMJRecentWeatherView.swift */,
+				7EC27DDA1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		7EC27DC71EEE759D00F13AB2 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				7EC27DC81EEE759D00F13AB2 /* ZMJWeatherStruct.swift */,
+			);
+			path = Tool;
+			sourceTree = "<group>";
+		};
+		7EC27DC91EEE759D00F13AB2 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7EC27DCA1EEE759D00F13AB2 /* ZMJWeaterController.swift */,
+				7EC27DD21EEE75E100F13AB2 /* ZMJEditLocationController.swift */,
+				7EC27DD81EEE89FB00F13AB2 /* ZMJAddLocationController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
 		7EE86FB81EDF2845009518FA /* ZMJWeather */ = {
 			isa = PBXGroup;
 			children = (
-				7EE86FB91EDF2845009518FA /* ZMJRecentWeatherView.swift */,
-				7EA46C921EDFB1590004AC4F /* ZMJDetailWeatherView.swift */,
-				7EE86FBA1EDF2845009518FA /* ZMJWeaterController.swift */,
-				7E43E6B51EE14AE5003DD89D /* ZMJWeatherStruct.swift */,
+				7EC27DC41EEE759C00F13AB2 /* View */,
+				7EC27DC71EEE759D00F13AB2 /* Tool */,
+				7EC27DC91EEE759D00F13AB2 /* Controller */,
 			);
 			path = ZMJWeather;
 			sourceTree = "<group>";
@@ -118,6 +156,7 @@
 				7EE86FBE1EDF2879009518FA /* ZMJLocationManager.swift */,
 				7EE86FBF1EDF2879009518FA /* ZMJNet.swift */,
 				7EB825931EE4069B00D9A937 /* ZMJConstant.swift */,
+				7EFB57EC1EEF91C6001AC574 /* Address.plist */,
 			);
 			path = ZMJTools;
 			sourceTree = "<group>";
@@ -204,6 +243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EA46C991EDFEE380004AC4F /* Launch Screen.storyboard in Resources */,
+				7EFB57ED1EEF91C6001AC574 /* Address.plist in Resources */,
 				7E7D2BDC1ED9F4E2002C27DC /* Assets.xcassets in Resources */,
 				7E7D2BDA1ED9F4E2002C27DC /* Main.storyboard in Resources */,
 			);
@@ -264,14 +304,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EC27DD91EEE89FB00F13AB2 /* ZMJAddLocationController.swift in Sources */,
 				7EE86FC41EDF2879009518FA /* ZMJCalenderController.swift in Sources */,
-				7E893F5A1EDB42260097827A /* ZMJMainController.swift in Sources */,
+				7EC27DCE1EEE759D00F13AB2 /* ZMJWeaterController.swift in Sources */,
+				7E893F5A1EDB42260097827A /* ZMJWeatherTabController.swift in Sources */,
+				7EC27DCC1EEE759D00F13AB2 /* ZMJRecentWeatherView.swift in Sources */,
+				7EC27DCD1EEE759D00F13AB2 /* ZMJWeatherStruct.swift in Sources */,
+				7EC27DD31EEE75E100F13AB2 /* ZMJEditLocationController.swift in Sources */,
+				7EC27DDB1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift in Sources */,
 				7EE86FC21EDF2879009518FA /* ZMJLocationManager.swift in Sources */,
-				7E43E6B61EE14AE5003DD89D /* ZMJWeatherStruct.swift in Sources */,
-				7EE86FBB1EDF2845009518FA /* ZMJRecentWeatherView.swift in Sources */,
 				7EB825941EE4069B00D9A937 /* ZMJConstant.swift in Sources */,
-				7EA46C931EDFB1590004AC4F /* ZMJDetailWeatherView.swift in Sources */,
-				7EE86FBC1EDF2845009518FA /* ZMJWeaterController.swift in Sources */,
+				7EC27DCB1EEE759D00F13AB2 /* ZMJDetailWeatherView.swift in Sources */,
+				7EC27DD71EEE85A600F13AB2 /* ZMJWeatherNavController.swift in Sources */,
 				7E7D2BD51ED9F4E2002C27DC /* AppDelegate.swift in Sources */,
 				7EE86FC31EDF2879009518FA /* ZMJNet.swift in Sources */,
 			);

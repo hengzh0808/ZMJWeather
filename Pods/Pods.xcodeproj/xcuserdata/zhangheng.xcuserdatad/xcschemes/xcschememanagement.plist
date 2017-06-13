@@ -9,12 +9,17 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Charts.xcscheme</key>
+		<key>DateToolsSwift.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>DateToolsSwift.xcscheme</key>
+		<key>FMDB.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>FSCalendar.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -57,12 +62,32 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>3B3E68FB31224BDC502E77FCC82E8295</key>
+		<key>02F8402C7F0D517841154C7814E5CCB7</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>58084F5810864870CC5B7821B2EC5853</key>
+		<key>1779FF6F4B52801AAD666F04FD1E8545</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>251BAD17812F7EBF6532EACF66F941C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>491656A4F705B349D8065ED875D21036</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>68F481444CEF5DAB53399EA94450E8FA</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>84E3919D8D2DEA1C666AFFF25E4B44EF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -72,17 +97,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>8EDE39E899531C6CB9F05557ACE55017</key>
+		<key>9C8C4EF96024E7358BAB29C305D71994</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>A18B692B3201F563BA4DA747044FEF86</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>D919F3083A0CCFE93D6C26516BF84208</key>
+		<key>C5A2DB7A84B7B78E359870D2E1B24AA7</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -93,16 +113,6 @@
 			<true/>
 		</dict>
 		<key>E89CFD99B895BCC6E8EDC2F95A03500C</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>EC1295DD73B8F5824E1B4362CF45CFA1</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>F307B842FF76B2DE6C55DB67C0885325</key>
 		<dict>
 			<key>primary</key>
 			<true/>
