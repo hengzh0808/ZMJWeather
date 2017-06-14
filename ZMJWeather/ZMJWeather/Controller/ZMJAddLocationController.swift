@@ -10,12 +10,13 @@ import UIKit
 import RxCocoa
 import SnapKit
 import PromiseKit
+import SwiftyJSON
 
 class ZMJAddLocationController: UIViewController {
 
     var addAddress:((LocationInfo)->Void)!
     var dataViews:Array<UIView> = []
-    private let locations:Array<String> = ["北京","上海","天津","重庆","哈尔滨","长春","沈阳","南昌","南京","济南","合肥","石家庄","郑州","武汉","长沙","西安","太原","成都","西宁","海口","广州","贵阳","杭州","福州","台北","兰州","昆明","呼和浩特","银川","乌鲁木齐","拉萨","南宁","香港","澳门"]
+    private var locations:Array<LocationInfo> = []
     @IBOutlet weak var addressInput: UITextField!
     @IBOutlet weak var addressOutput: UILabel!
     @IBOutlet weak var autoLocationSign: UIImageView!
@@ -24,10 +25,29 @@ class ZMJAddLocationController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        initCityData()
         initEvents()
         addLocationViews()
     }
     
+    func initCityData() {
+        let path = Bundle.main.path(forResource: "City", ofType: "txt")
+        do {
+            let content = try String(contentsOfFile:path!, encoding: String.Encoding.utf8)
+            let json = JSON.init(parseJSON: content)
+            let citys = json.arrayObject
+            for city in citys! {
+                let cityInfo:NSDictionary! = city as! NSDictionary
+                let location = LocationInfo.init()
+                location.adcode = cityInfo.value(forKey: "adcode") as! String
+                location.city = cityInfo.value(forKey: "name") as! String
+                location.latitude = (cityInfo.value(forKey: "latitude") as! NSNumber).doubleValue
+                location.longitude = (cityInfo.value(forKey: "longitude") as! NSNumber).doubleValue
+                locations.append(location)
+            }
+        } catch {}
+    }
+
     func initEvents() {
         weak var weakSelf = self
         _ = addressInput.rx.text.orEmpty.asObservable().subscribe(onNext: { (text) in
@@ -99,7 +119,7 @@ class ZMJAddLocationController: UIViewController {
     
     func addSearchErrorView(error:NSError) {
         removeLocations();
-        
+
         let errorLabel =  UILabel.init()
         errorLabel.font = UIFont.systemFont(ofSize: 16.0)
         errorLabel.textColor = Color115
@@ -125,20 +145,20 @@ class ZMJAddLocationController: UIViewController {
     
     func addLocationViews() {
         removeLocations();
+        
+        weak var weakSelf = self
         for (index, location) in locations.enumerated() {
             let row = index / 5
             let col = index % 5
             let button = UIButton.init(type: .custom)
-            button.setTitle(location, for: .normal)
+            button.setTitle(location.city, for: .normal)
             button.setTitleColor(Color115, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
             _ = button.rx.tap.asControlEvent().subscribe(onNext: { () in
-                locationManager.search(address: location).then(execute: { (infos) -> Promise<Bool> in
-                    return locationManager.save(location: infos.first!)
-                }).then(execute: { (result) -> Void in
-                    print("")
-                }).catch(execute: { (error) in
-                    print("")
+                locationManager.saveLocation(location: location, type: .Manual).then(on: DispatchQueue.main, execute: { (result) -> Void in
+                    weakSelf?.navigationController?.popViewController(animated: true)
+                }).catch(on: DispatchQueue.main, execute: { (error) in
+                    UIAlertView.init(title: nil, message: "当前城市已添加", delegate: nil, cancelButtonTitle: "确认").show()
                 })
             })
             dataViews.append(button)

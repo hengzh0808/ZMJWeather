@@ -95,7 +95,7 @@ class ZMJDetailWeatherView: UIScrollView {
         }
     }
     
-    func set(now:NSDictionary, today:NSDictionary, aqi:NSDictionary) {
+    func set(now:NSDictionary!, today:NSDictionary!, aqi:NSDictionary!) {
         detailWeather.weatherCode =  ((now.value(forKey: "cond") as? NSDictionary)?.value(forKey: "code") as? String) ?? ""
         detailWeather.weatherText =  ((now.value(forKey: "cond") as? NSDictionary)?.value(forKey: "txt") as? String) ?? ""
         detailWeather.nowTemp = (now.value(forKey: "tmp") as? String) ?? ""
@@ -152,18 +152,21 @@ private class DetailWeatherView: UIView {
     
             aqiView.isHidden = false
             aqiLable.text = weather.pm25
-            if Int(weather.pm25)! <= 35 {
-                aqiLable.text = aqiLable.text?.appending("  空气质量优秀")
-            } else if Int(weather.pm25)! > 35 && Int(weather.pm25)! <= 75 {
-                aqiLable.text = aqiLable.text?.appending("  空气质量良好")
-            } else if Int(weather.pm25)! > 75 && Int(weather.pm25)! <= 115 {
-                aqiLable.text = aqiLable.text?.appending("  空气轻度污染")
-            } else if Int(weather.pm25)! > 115 && Int(weather.pm25)! <= 150 {
-                aqiLable.text = aqiLable.text?.appending("  空气中度污染")
-            } else if Int(weather.pm25)! > 150 && Int(weather.pm25)! <= 250 {
-                aqiLable.text = aqiLable.text?.appending("  空气重度污染")
-            } else {
-                aqiLable.text = aqiLable.text?.appending("  空气严重污染")
+            
+            if Int(weather.pm25) != nil {
+                if Int(weather.pm25)! <= 35 {
+                    aqiLable.text = aqiLable.text?.appending("  空气质量优秀")
+                } else if Int(weather.pm25)! > 35 && Int(weather.pm25)! <= 75 {
+                    aqiLable.text = aqiLable.text?.appending("  空气质量良好")
+                } else if Int(weather.pm25)! > 75 && Int(weather.pm25)! <= 115 {
+                    aqiLable.text = aqiLable.text?.appending("  空气轻度污染")
+                } else if Int(weather.pm25)! > 115 && Int(weather.pm25)! <= 150 {
+                    aqiLable.text = aqiLable.text?.appending("  空气中度污染")
+                } else if Int(weather.pm25)! > 150 && Int(weather.pm25)! <= 250 {
+                    aqiLable.text = aqiLable.text?.appending("  空气重度污染")
+                } else {
+                    aqiLable.text = aqiLable.text?.appending("  空气严重污染")
+                }
             }
         }
     }

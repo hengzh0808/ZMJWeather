@@ -1,0 +1,206 @@
+[
+{
+"latitude" : 39.90403,
+"name" : "北京",
+"longitude" : 116.407526,
+"adcode" : "110000"
+},
+{
+"latitude" : 31.230416,
+"name" : "上海",
+"longitude" : 121.473701,
+"adcode" : "310000"
+},
+{
+"latitude" : 39.084158,
+"name" : "天津",
+"longitude" : 117.200983,
+"adcode" : "120000"
+},
+{
+"latitude" : 29.563009,
+"name" : "重庆",
+"longitude" : 106.551556,
+"adcode" : "500000"
+},
+{
+"latitude" : 45.803775,
+"name" : "哈尔滨",
+"longitude" : 126.534967,
+"adcode" : "230100"
+},
+{
+"latitude" : 43.817071,
+"name" : "长春",
+"longitude" : 125.323544,
+"adcode" : "220100"
+},
+{
+"latitude" : 41.805698,
+"name" : "沈阳",
+"longitude" : 123.431474,
+"adcode" : "210100"
+},
+{
+"latitude" : 28.682892,
+"name" : "南昌",
+"longitude" : 115.858197,
+"adcode" : "360100"
+},
+{
+"latitude" : 32.060255,
+"name" : "南京",
+"longitude" : 118.796877,
+"adcode" : "320100"
+},
+{
+"latitude" : 36.651216,
+"name" : "济南",
+"longitude" : 117.119999,
+"adcode" : "370100"
+},
+{
+"latitude" : 31.820586,
+"name" : "合肥",
+"longitude" : 117.227239,
+"adcode" : "340100"
+},
+{
+"latitude" : 38.042309,
+"name" : "石家庄",
+"longitude" : 114.514862,
+"adcode" : "130100"
+},
+{
+"latitude" : 34.746599,
+"name" : "郑州",
+"longitude" : 113.625368,
+"adcode" : "410100"
+},
+{
+"latitude" : 28.228209,
+"name" : "长沙",
+"longitude" : 112.938814,
+"adcode" : "430100"
+},
+{
+"latitude" : 30.593098,
+"name" : "武汉",
+"longitude" : 114.305392,
+"adcode" : "420100"
+},
+{
+"latitude" : 34.341568,
+"name" : "西安",
+"longitude" : 108.940174,
+"adcode" : "610100"
+},
+{
+"latitude" : 37.87059,
+"name" : "太原",
+"longitude" : 112.548879,
+"adcode" : "140100"
+},
+{
+"latitude" : 30.572269,
+"name" : "成都",
+"longitude" : 104.066541,
+"adcode" : "510100"
+},
+{
+"latitude" : 36.617144,
+"name" : "西宁",
+"longitude" : 101.778228,
+"adcode" : "630100"
+},
+{
+"latitude" : 20.044001,
+"name" : "海口",
+"longitude" : 110.198293,
+"adcode" : "460100"
+},
+{
+"latitude" : 23.129162,
+"name" : "广州",
+"longitude" : 113.264434,
+"adcode" : "440100"
+},
+{
+"latitude" : 26.647661,
+"name" : "贵阳",
+"longitude" : 106.630153,
+"adcode" : "520100"
+},
+{
+"latitude" : 30.274084,
+"name" : "杭州",
+"longitude" : 120.15507,
+"adcode" : "330100"
+},
+{
+"latitude" : 26.074507,
+"name" : "福州",
+"longitude" : 119.296494,
+"adcode" : "350100"
+},
+{
+"latitude" : 36.061089,
+"name" : "兰州",
+"longitude" : 103.834303,
+"adcode" : "620100"
+},
+{
+"latitude" : 30.597507,
+"name" : "武汉",
+"longitude" : 114.277985,
+"adcode" : "420102"
+},
+{
+"latitude" : 24.880095,
+"name" : "昆明",
+"longitude" : 102.832891,
+"adcode" : "530100"
+},
+{
+"latitude" : 40.842585,
+"name" : "呼和浩特",
+"longitude" : 111.74918,
+"adcode" : "150100"
+},
+{
+"latitude" : 38.487193,
+"name" : "银川",
+"longitude" : 106.230909,
+"adcode" : "640100"
+},
+{
+"latitude" : 43.825592,
+"name" : "乌鲁木齐",
+"longitude" : 87.616848,
+"adcode" : "650100"
+},
+{
+"latitude" : 29.645554,
+"name" : "拉萨",
+"longitude" : 91.140856,
+"adcode" : "540100"
+},
+{
+"latitude" : 22.817002,
+"name" : "南宁",
+"longitude" : 108.366543,
+"adcode" : "450100"
+},
+{
+"latitude" : 22.320047,
+"name" : "香港",
+"longitude" : 114.173355,
+"adcode" : "810000"
+},
+{
+"latitude" : 22.19895,
+"name" : "澳门",
+"longitude" : 113.549088,
+"adcode" : "820000"
+}
+]

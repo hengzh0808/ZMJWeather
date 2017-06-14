@@ -36,7 +36,7 @@ class ZMJRecentWeatherView: UIView {
                 }
             }
             topView.weathers = recentWeathers
-
+            
             middleView.setTemps(recentWeathers: recentWeathers)
             middleView.resetTemplines()
         }
@@ -64,7 +64,7 @@ class ZMJRecentWeatherView: UIView {
         
         middleView.backgroundColor = ColorBlue
         self.addSubview(middleView)
-
+        
         bottomView.backgroundColor = UIColor.blue
         self.addSubview(bottomView)
     }
@@ -77,6 +77,10 @@ class ZMJRecentWeatherView: UIView {
     func resetRecentDetails() {
         topView.hideDate()
         middleView.resetTemplines()
+    }
+    
+    func panBegin() {
+        topView.panBegin()
     }
 }
 
@@ -154,7 +158,7 @@ private class ZMJRecentTopView: UIView {
         for weatherView in weatherViews {
             weatherView.showDate()
         }
-        UIView.animate(withDuration: 0.25) { 
+        UIView.animate(withDuration: 0.25) {
             self.hideView.alpha = 0.0
         }
     }
@@ -168,8 +172,7 @@ private class ZMJRecentTopView: UIView {
         }
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
+    func panBegin() {
         hideView.alpha = 0.0
         for weatherView in weatherViews {
             weatherView.dateLabel.textColor = UIColor.white
@@ -180,16 +183,20 @@ private class ZMJRecentTopView: UIView {
         }
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        panBegin()
+    }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event);
+        super.touchesEnded(touches, with: event)
         hideView.alpha = 1.0
-        let color = UIColor.init(red: 204.0 / 255.0, green: 204.0 / 255.0, blue: 204.0 / 255.0, alpha: 1.0)
         for weatherView in weatherViews {
-            weatherView.dateLabel.textColor = color
-            weatherView.weekLabel.textColor = color
-            weatherView.maxTempLabel.textColor = color
-            weatherView.minTempLabel.textColor = color
-            weatherView.weatherSign.tintColor = color
+            weatherView.dateLabel.textColor = Color204
+            weatherView.weekLabel.textColor = Color204
+            weatherView.maxTempLabel.textColor = Color204
+            weatherView.minTempLabel.textColor = Color204
+            weatherView.weatherSign.tintColor = Color204
         }
     }
     
@@ -264,7 +271,7 @@ private class ZMJRecentTopView: UIView {
                 make.centerX.equalToSuperview()
                 make.height.equalTo(weekLabel.snp.height)
             }
-            UIView.animate(withDuration: 0.25) { 
+            UIView.animate(withDuration: 0.25) {
                 self.layoutSubviews()
                 self.dateLabel.textColor = UIColor.white
                 self.weekLabel.textColor = UIColor.white
@@ -420,7 +427,7 @@ private class ZMJRecentMiddleView: UIView {
         for _ in 0..<minTemps.count {
             averageMinTemps.append(minTemp + (maxTemp - minTemp) / 3)
         }
-
+        
         draw(minTemps: averageMinTemps, maxTemps: averageMaxTemps, animete: false)
     }
     
@@ -449,7 +456,7 @@ private class ZMJRecentMiddleView: UIView {
                 point.y = CGFloat((yPadding + perHeight * Float((maxTemp - minTemps[index]))))
                 minPoints.append(point)
             }
-
+            
             // 画最高温度线
             let maxShadowStartPoint:CGPoint = maxPoints.min(by: { (point1, point2) -> Bool in
                 return point1.y < point2.y
@@ -496,7 +503,7 @@ private class ZMJRecentMiddleView: UIView {
         var previousControlPoint1:CGPoint = CGPoint.zero
         var previousControlPoint2:CGPoint = CGPoint.zero
         var controlPoint1:CGPoint = CGPoint.zero
-    
+        
         for index in 1..<points.count {
             let toPoint = points[index]
             if index > 0 {
@@ -522,7 +529,7 @@ private class ZMJRecentMiddleView: UIView {
             } else {
                 path.addCurve(to: previousPoint, controlPoint1: previousControlPoint1, controlPoint2: previousControlPoint2)
             }
-
+            
             previousControlPoint1 = controlPoint1
             previousPoint = toPoint
         }

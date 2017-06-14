@@ -9,13 +9,20 @@
 import UIKit
 import PromiseKit
 import FMDB
+import SwiftyJSON
 
 @objc class LocationInfo:NSObject {
     var latitude:Double!
     var longitude:Double!
+    var adcode:String! // 区域编码
     var province:String! // 省
     var city:String! // 市
     var district:String! // 区
+}
+
+enum LocationType:String {
+    case Auto = "auto"
+    case Manual = "manual"
 }
 
 typealias AddressHandlerStart = @convention(block) () -> Void
@@ -41,12 +48,12 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         dbQueue.inDatabase { (db) in
             do {
                 // 地理位置表
-                try db.executeUpdate("create table if not exists location(latitude float, longitude float, province text, city text, district text)", values: nil)
+                try db.executeUpdate("create table if not exists location(adcode text, type text,latitude float, longitude float, province text, city text, district text, primary key(adcode, type))", values: nil)
             } catch {}
             
             do {
                 // 天气信息
-                try db.executeUpdate("create table if not exists weather(weather text)", values: nil)
+                try db.executeUpdate("create table if not exists weather(weather text, adcode text primary key)", values: nil)
             } catch {}
         }
     }
@@ -93,11 +100,12 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
                 var locations:Array<LocationInfo> = []
                 for geocode in response.geocodes {
                     let locationInfo = LocationInfo.init()
-                    locationInfo.province = (geocode.province != nil && (geocode.province as NSString).length > 0) ? geocode.province : nil
-                    locationInfo.city = (geocode.city != nil && (geocode.city as NSString).length > 0) ? geocode.city : nil
-                    locationInfo.district = (geocode.district != nil && (geocode.district as NSString).length > 0) ? geocode.district : nil
+                    locationInfo.province = geocode.province ?? nil
+                    locationInfo.city = geocode.city ?? nil
+                    locationInfo.district = geocode.district ?? nil
                     locationInfo.latitude = Double(geocode.location.latitude)
                     locationInfo.longitude = Double(geocode.location.longitude)
+                    locationInfo.adcode = geocode.adcode ?? nil
                     locations.append(locationInfo)
                 }
                 if locations.count > 0 {
@@ -112,17 +120,77 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         }
     }
     
-    func save(location:LocationInfo) -> Promise<Bool> {
+    func saveLocation(location:LocationInfo, type:LocationType) -> Promise<Bool> {
         let (promise, fulfill, reject) = Promise<Bool>.pending()
         DispatchQueue.global(qos: .userInitiated).async {
             self.dbQueue.inDatabase { (db) in
                 do {
-                    try db.executeUpdate("insert into location values(?,?,?,?,?)", values: [location.latitude ?? "", location.longitude ?? 0.0, location.province ?? 0.0, location.city ?? "", location.district ?? ""])
+                    try db.executeUpdate("insert into location (adcode, type, latitude, longitude, province, city, district) values (?, ?, ?, ?, ?, ?)", values: [location.adcode, type.rawValue, location.latitude ?? "", location.longitude ?? 0.0, location.province ?? 0.0, location.city ?? "", location.district ?? ""])
                     fulfill(true)
                 } catch {
                     reject(error)
                 }
             }
+        }
+        return promise
+    }
+    
+    func saveWeather(weatherInfo:NSDictionary!, adcode:String!) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.dbQueue.inDatabase({ (db) in
+                do {
+                    try db.executeUpdate("insert into weather (adcode, weather) values (?, ?)", values: [adcode ?? "", JSON.init(rawValue: weatherInfo)?.rawString()! ?? ""])
+                } catch {
+                    do {
+                        try db.executeUpdate("update weather set weather = ? where adcode = ?", values: [JSON.init(rawValue: weatherInfo)?.rawString()! ?? "", adcode ?? ""])
+                    } catch {}
+                }
+            })
+        }
+    }
+    
+    func weather(adcode:String!) -> Promise<NSDictionary?> {
+        let (promise, fulfill, reject) = Promise<NSDictionary?>.pending()
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.dbQueue.inDatabase({ (db) in
+                do {
+                    let result:FMResultSet = try db.executeQuery("select * from weather where adcode = ?", values: [adcode])
+                    var weatherInfo:NSDictionary?
+                    while result.next() {
+                        let value = result.string(forColumn: "weather")
+                        weatherInfo = JSON.init(parseJSON: value!).dictionaryObject as? NSDictionary
+                    }
+                    fulfill(weatherInfo)
+                } catch {
+                    reject(error)
+                }
+            })
+        }
+        return promise
+    }
+    
+    func locations(queue:DispatchQueue = DispatchQueue.global(qos: .userInitiated)) -> Promise<Array<LocationInfo>> {
+        let (promise, fulfill, reject) = Promise<Array<LocationInfo>>.pending()
+        queue.async {
+            self.dbQueue.inDatabase({ (db) in
+                do {
+                    let result:FMResultSet = try db.executeQuery("select * from location", values: nil)
+                    var locations:Array<LocationInfo> = []
+                    while result.next() {
+                        let location = LocationInfo.init()
+                        location.adcode = result.string(forColumn: "adcode")!
+                        location.latitude = result.double(forColumn: "latitude")
+                        location.longitude = result.double(forColumn: "longitude")
+                        location.province = result.string(forColumn: "province")!
+                        location.city = result.string(forColumn: "city")!
+                        location.district = result.string(forColumn: "district")!
+                        locations.append(location)
+                    }
+                    fulfill(locations)
+                } catch {
+                    reject(error)
+                }
+            })
         }
         return promise
     }

@@ -11,24 +11,13 @@ import PromiseKit
 import SnapKit
 import MJRefresh
 
-class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
-
-    @IBOutlet weak var topBarView: UIView!
+class ZMJWeatherDetailController: UIViewController, UIGestureRecognizerDelegate {
     
-    var detailWeatherView:ZMJDetailWeatherView = ZMJDetailWeatherView()
-    var recentWeatherView:ZMJRecentWeatherView = ZMJRecentWeatherView()
+    
     var locationInfo:LocationInfo!
-    var editLocationController:ZMJEditLocationController {
-        return (self.navigationController as! ZMJWeatherNavController).locationController
-    }
-    var addLocationController:ZMJAddLocationController = ZMJAddLocationController()
-    var tapGesture:UITapGestureRecognizer {
-        return UITapGestureRecognizer.init(target: self, action: #selector(showEditLocation(_:)))
-    }
     
-//    var addressHandlerStart:(@convention(block) ()->Void)!
-//    var addressHanderSuccess:(@convention(block) (LocationInfo) -> Void)!
-//    var addressHanderError:(@convention(block) (String) -> Void)!
+    private var detailWeatherView:ZMJDetailWeatherView = ZMJDetailWeatherView()
+    private var recentWeatherView:ZMJRecentWeatherView = ZMJRecentWeatherView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,14 +40,15 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
     
     // MARK:自定义方法
     private func initSubView() {
-        detailWeatherView.mj_header = MJRefreshStateHeader.init(refreshingBlock: { 
-            self.updateWeather()
+        detailWeatherView.contentSize = self.view.bounds.size
+        detailWeatherView.mj_header = MJRefreshStateHeader.init(refreshingBlock: {
+            self.requestWeatherInfo()
         })
         (detailWeatherView.mj_header as! MJRefreshStateHeader).lastUpdatedTimeLabel.textColor = UIColor.white
         (detailWeatherView.mj_header as! MJRefreshStateHeader).stateLabel.textColor = UIColor.white
         detailWeatherView.backgroundColor = ColorBlue
         detailWeatherView.alwaysBounceVertical = true
-        self.view.insertSubview(detailWeatherView, belowSubview: topBarView)
+        self.view .addSubview(detailWeatherView)
         detailWeatherView.snp.makeConstraints { (make) in
             make.top.equalToSuperview()
             make.left.equalToSuperview()
@@ -71,69 +61,51 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
         recentWeatherView.backgroundColor = UIColor.red
         recentWeatherView.addGestureRecognizer(panGesture)
         self.view.addSubview(recentWeatherView)
-        
-        editLocationInit()
-        addLocationInit()
     }
     
-    func editLocationInit() {
-        editLocationController.deleteAddress = {(locationInfo) in
-            
-        }
-        editLocationController.selectAddress = {(locationInfo) in
-            
-        }
-        editLocationController.defaultAddress = {(locationInfo) in
-            
-        }
-    }
-    
-    func addLocationInit() {
-        addLocationController.addAddress = {(locationInfo) in
-            
-        }
-    }
-    
-    @IBAction func showEditLocation(_ sender: Any) {
-        (self.navigationController as! ZMJWeatherNavController).showEditLocation { (show) in
-            if show {
-                self.view.addGestureRecognizer(self.tapGesture)
-            } else {
-                self.view.removeGestureRecognizer(self.tapGesture)
-            }
-        }
-    }
-    
-    @IBAction func showAddLocation(_ sender: Any) {
-        self.navigationController?.pushViewController(UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ZMJAddLocationController"), animated: true)
-    }
-    
-    
-    @objc private func updateWeather() {
+    @objc private func requestWeatherInfo() {
         (detailWeatherView.mj_header as! MJRefreshStateHeader).stateLabel.text = "正在获取位置信息"
         weak var weakSelf = self
-        locationManager.updateLocation().then { (locationInfo) -> Promise<NSDictionary?> in
-            weakSelf?.locationInfo = locationInfo
+        var promise:Promise<NSDictionary?>
+        if locationInfo != nil {
             (weakSelf?.detailWeatherView.mj_header as! MJRefreshStateHeader).stateLabel.text = "正在获取天气状况"
             weakSelf?.detailWeatherView.cityLabel.text = locationInfo.city
             weakSelf?.detailWeatherView.districtLabel.text = locationInfo.district
-            return ZMJSingleNet.request(request: ZMJRequest.WeatherAll, method: .get, paths: [], parameters: ["city":(String(locationInfo.longitude) + "," + String(locationInfo.latitude))], form: [:])
-        }.then { (todayInfo) -> Void in
+            promise = ZMJSingleNet.request(request: ZMJRequest.WeatherAll, method: .get, paths: [], parameters: ["city":(String(locationInfo.longitude) + "," + String(locationInfo.latitude))], form: [:])
+        } else {
+            promise = locationManager.updateLocation().then { (locationInfo) -> Promise<NSDictionary?> in
+                weakSelf?.locationInfo = locationInfo
+                _ = locationManager.saveLocation(location: locationInfo, type: .Auto)
+                (weakSelf?.detailWeatherView.mj_header as! MJRefreshStateHeader).stateLabel.text = "正在获取天气状况"
+                weakSelf?.detailWeatherView.cityLabel.text = locationInfo.city
+                weakSelf?.detailWeatherView.districtLabel.text = locationInfo.district + "(自动定位)"
+                return ZMJSingleNet.request(request: ZMJRequest.WeatherAll, method: .get, paths: [], parameters: ["city":(String(locationInfo.longitude) + "," + String(locationInfo.latitude))], form: [:])
+            }
+        }
+        promise.then { (todayInfo:NSDictionary?) -> Void in
+            locationManager.saveWeather(weatherInfo: todayInfo!, adcode: weakSelf?.locationInfo.adcode)
             weakSelf?.detailWeatherView.mj_header.endRefreshing()
-            let daily_forecast:NSArray! = todayInfo?.value(forKey: "daily_forecast") as! NSArray // 3~10天预报
-            let now:NSDictionary! = todayInfo?.value(forKey: "now") as! NSDictionary // 实况天气
-            var _:NSArray! = todayInfo?.value(forKey: "hourly_forecast") as! NSArray // 未来每小时天气预报
-            var _:NSDictionary! = todayInfo?.value(forKey: "suggestion") as! NSDictionary // 生活指数
-            let aqi:NSDictionary! = todayInfo?.value(forKey: "aqi") as! NSDictionary // 空气污染指数
-            weakSelf?.recentWeatherView.daily_forecast = daily_forecast
-            weakSelf?.detailWeatherView.set(now: now, today: (daily_forecast.firstObject! as? NSDictionary)!, aqi: aqi)
+            weakSelf?.updateWeather(weatherInfo: todayInfo)
         }.catch { (error) in
             weakSelf?.detailWeatherView.mj_header.endRefreshing()
             print("无法获取地理位置，请检查访问位置权限以及网络状态")
         }
     }
     
+    func updateWeather(weatherInfo:NSDictionary?) {
+        let daily_forecast:NSArray! = weatherInfo?.value(forKey: "daily_forecast") as? NSArray ?? NSArray.init() // 3~10天预报
+        let now:NSDictionary! = weatherInfo?.value(forKey: "now") as? NSDictionary ?? NSDictionary.init() // 实况天气
+        var _:NSArray! = weatherInfo?.value(forKey: "hourly_forecast") as? NSArray ?? NSArray.init() // 未来每小时天气预报
+        var _:NSDictionary! = weatherInfo?.value(forKey: "suggestion") as? NSDictionary ?? NSDictionary.init() // 生活指数
+        let aqi:NSDictionary! = weatherInfo?.value(forKey: "aqi") as? NSDictionary ?? NSDictionary.init() // 空气污染指数
+        self.recentWeatherView.daily_forecast = daily_forecast
+        self.detailWeatherView.set(now: now, today: (daily_forecast.firstObject! as? NSDictionary)!, aqi: aqi)
+    }
+    
     @objc private func panRecentWeatherView(panGesture:UIPanGestureRecognizer) {
+        if panGesture.state == .began {
+            recentWeatherView.panBegin()
+        }
         let offset:CGPoint = panGesture.translation(in: panGesture.view)
         panGesture.setTranslation(CGPoint.init(x: 0, y: 0), in: panGesture.view)
         if (recentWeatherView.frame.minY + offset.y) > self.view.frame.height - 85.0 {
@@ -143,11 +115,6 @@ class ZMJWeaterController: UIViewController, UIGestureRecognizerDelegate {
         } else {
             recentWeatherView.frame = CGRect.init(x: 0.0, y:recentWeatherView.frame.minY + offset.y, width: self.view.frame.width, height: recentWeatherView.frame.height)
         }
-        
-//        let distance = recentWeatherView.frame.height - 85
-//        let offsetDistance =  (recentWeatherView.frame.height - 85) - (recentWeatherView.frame.maxY - self.view.frame.maxY)
-//        let offsetRatio = offsetDistance / distance
-//        recentWeatherView.set(offsetRatio: Float(offsetRatio))
         
         switch panGesture.state {
             case UIGestureRecognizerState.ended,UIGestureRecognizerState.cancelled,UIGestureRecognizerState.failed:
