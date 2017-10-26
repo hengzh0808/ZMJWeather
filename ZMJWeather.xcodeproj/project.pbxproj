@@ -15,6 +15,7 @@
 		7E7D2BDC1ED9F4E2002C27DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E7D2BDB1ED9F4E2002C27DC /* Assets.xcassets */; };
 		7E893F5A1EDB42260097827A /* ZMJWeatherTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E893F591EDB42260097827A /* ZMJWeatherTabController.swift */; };
 		7EA46C991EDFEE380004AC4F /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7EA46C981EDFEE380004AC4F /* Launch Screen.storyboard */; };
+		7EB276E61F0A3BD200EA3B5A /* UIView+SpringPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EB276E51F0A3BD200EA3B5A /* UIView+SpringPromise.swift */; };
 		7EB825941EE4069B00D9A937 /* ZMJConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EB825931EE4069B00D9A937 /* ZMJConstant.swift */; };
 		7EC27DCB1EEE759D00F13AB2 /* ZMJDetailWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DC51EEE759C00F13AB2 /* ZMJDetailWeatherView.swift */; };
 		7EC27DCC1EEE759D00F13AB2 /* ZMJRecentWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC27DC61EEE759C00F13AB2 /* ZMJRecentWeatherView.swift */; };
@@ -44,6 +45,7 @@
 		7E893F591EDB42260097827A /* ZMJWeatherTabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherTabController.swift; sourceTree = "<group>"; };
 		7EA46C941EDFE6B20004AC4F /* ZMJWeather-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZMJWeather-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EA46C981EDFEE380004AC4F /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		7EB276E51F0A3BD200EA3B5A /* UIView+SpringPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+SpringPromise.swift"; sourceTree = "<group>"; };
 		7EB825931EE4069B00D9A937 /* ZMJConstant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJConstant.swift; sourceTree = "<group>"; };
 		7EC27DC51EEE759C00F13AB2 /* ZMJDetailWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJDetailWeatherView.swift; sourceTree = "<group>"; };
 		7EC27DC61EEE759C00F13AB2 /* ZMJRecentWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJRecentWeatherView.swift; sourceTree = "<group>"; };
@@ -51,7 +53,7 @@
 		7EC27DCA1EEE759D00F13AB2 /* ZMJWeatherDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherDetailController.swift; sourceTree = "<group>"; };
 		7EC27DD21EEE75E100F13AB2 /* ZMJEditLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJEditLocationController.swift; sourceTree = "<group>"; };
 		7EC27DD61EEE85A600F13AB2 /* ZMJWeatherNavController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJWeatherNavController.swift; sourceTree = "<group>"; };
-		7EC27DD81EEE89FB00F13AB2 /* ZMJAddLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJAddLocationController.swift; sourceTree = "<group>"; };
+		7EC27DD81EEE89FB00F13AB2 /* ZMJAddLocationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ZMJAddLocationController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		7EC27DDA1EEE8E2D00F13AB2 /* ZMJLocationLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJLocationLabel.swift; sourceTree = "<group>"; };
 		7EE86FBE1EDF2879009518FA /* ZMJLocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJLocationManager.swift; sourceTree = "<group>"; };
 		7EE86FBF1EDF2879009518FA /* ZMJNet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMJNet.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 				7EE86FBE1EDF2879009518FA /* ZMJLocationManager.swift */,
 				7EE86FBF1EDF2879009518FA /* ZMJNet.swift */,
 				7EB825931EE4069B00D9A937 /* ZMJConstant.swift */,
+				7EB276E51F0A3BD200EA3B5A /* UIView+SpringPromise.swift */,
 				7EFB57EC1EEF91C6001AC574 /* Address.plist */,
 				7E3A63B91EF1165A00D78498 /* City.txt */,
 			);
@@ -322,6 +325,7 @@
 				7EE86FC21EDF2879009518FA /* ZMJLocationManager.swift in Sources */,
 				7EB825941EE4069B00D9A937 /* ZMJConstant.swift in Sources */,
 				7EC27DCB1EEE759D00F13AB2 /* ZMJDetailWeatherView.swift in Sources */,
+				7EB276E61F0A3BD200EA3B5A /* UIView+SpringPromise.swift in Sources */,
 				7E3A63BE1EF1313700D78498 /* ZMJWeahterHolderController.swift in Sources */,
 				7EC27DD71EEE85A600F13AB2 /* ZMJWeatherNavController.swift in Sources */,
 				7E7D2BD51ED9F4E2002C27DC /* AppDelegate.swift in Sources */,

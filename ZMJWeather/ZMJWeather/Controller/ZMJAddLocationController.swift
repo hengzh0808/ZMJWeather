@@ -64,9 +64,8 @@ class ZMJAddLocationController: UIViewController {
                 weakSelf?.addSearchErrorView(error: error as NSError)
             })
         })
-        
-        locationManager.updateLocation().then { (locationInfo) -> Void in
-            weakSelf?.addressOutput.text = locationInfo.city + "，" + locationInfo.district
+        locationManager.queryAutoLocation(update: true).then(on: DispatchQueue.main) { (locationInfo) -> Void in
+            weakSelf?.addressOutput.text = (locationInfo?.city)! + "，" + (locationInfo?.district)!
             weakSelf?.autoLocationLabel.text = "自动定位"
         }.catch { (error) in
             weakSelf?.autoLocationLabel.text = "自动定位失败"
@@ -82,26 +81,31 @@ class ZMJAddLocationController: UIViewController {
     func addSearchResult(locations:Array<LocationInfo>) {
         removeLocations()
         for (index, location) in locations.enumerated() {
-            let locationLabel = UILabel.init()
-            locationLabel.textColor = Color115
-            locationLabel.font = UIFont.systemFont(ofSize: 16.0)
+            let locationButton = UIButton.init(type: .custom)
+            locationButton.setTitleColor(Color115, for: .normal)
+            locationButton.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
             var address:NSString! = ""
-            if (location.district != nil) {
-                address = address.appending(location.district + ",") as NSString
+            if (location.district != nil && NSString.init(string: location.district).length > 0) {
+                address = address.appending(location.district) as NSString
             }
-            if (location.city != nil) {
-                address = address.appending(location.city + ",") as NSString
+            if (location.city != nil && NSString.init(string: location.city).length > 0) {
+                address = address.appending((address.length > 0 ? "," : "") + location.city) as NSString
             }
-            if (location.province != nil) {
-                address = address.appending(location.province) as NSString
+            if (location.province != nil && NSString.init(string: location.province).length > 0) {
+                address = address.appending((address.length > 0 ? "," : "") + location.province) as NSString
             }
-            locationLabel.text =  address! as String
-            dataViews.append(locationLabel)
-            self.view.addSubview(locationLabel)
-            locationLabel.snp.makeConstraints({ (make) in
+            locationButton.setTitle(address! as String, for: .normal)
+            dataViews.append(locationButton)
+            self.view.addSubview(locationButton)
+            locationButton.snp.makeConstraints({ (make) in
                 make.top.equalToSuperview().offset(168 + 44 * index)
                 make.left.equalTo(self.addressOutput.snp.left)
                 make.height.equalTo(44)
+            })
+            
+            weak var weakSelf = self
+            _ = locationButton.rx.tap.asControlEvent().subscribe(onNext: { () in
+                weakSelf?.saveLocation(location: location)
             })
             
             let lineView = UIView.init()
@@ -145,8 +149,6 @@ class ZMJAddLocationController: UIViewController {
     
     func addLocationViews() {
         removeLocations();
-        
-        weak var weakSelf = self
         for (index, location) in locations.enumerated() {
             let row = index / 5
             let col = index % 5
@@ -154,12 +156,9 @@ class ZMJAddLocationController: UIViewController {
             button.setTitle(location.city, for: .normal)
             button.setTitleColor(Color115, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0)
+            weak var weakSelf = self
             _ = button.rx.tap.asControlEvent().subscribe(onNext: { () in
-                locationManager.saveLocation(location: location, type: .Manual).then(on: DispatchQueue.main, execute: { (result) -> Void in
-                    weakSelf?.navigationController?.popViewController(animated: true)
-                }).catch(on: DispatchQueue.main, execute: { (error) in
-                    UIAlertView.init(title: nil, message: "当前城市已添加", delegate: nil, cancelButtonTitle: "确认").show()
-                })
+                weakSelf?.saveLocation(location: location)
             })
             dataViews.append(button)
             self.view.addSubview(button)
@@ -182,6 +181,15 @@ class ZMJAddLocationController: UIViewController {
                 })
             }
         }
+    }
+    
+    func saveLocation(location:LocationInfo) {
+        weak var weakSelf = self
+        locationManager.saveLocation(location: location, type: .Manual).then(on: DispatchQueue.main, execute: { (result) -> Void in
+            weakSelf?.navigationController?.popViewController(animated: true)
+        }).catch(on: DispatchQueue.main, execute: { (error) in
+            UIAlertView.init(title: nil, message: "当前城市已添加", delegate: nil, cancelButtonTitle: "确认").show()
+        })
     }
     
     @IBAction func backController(_ sender: Any) {

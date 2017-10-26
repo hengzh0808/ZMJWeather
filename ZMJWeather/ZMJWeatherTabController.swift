@@ -19,11 +19,6 @@ class ZMJWeatherTabController: UITabBarController {
         self.view.layer.shadowRadius = 3.0;
         self.view.layer.shadowOpacity = 0.2;
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         (self.tabBar as! ZMJTabbar) .setSelectedIndex(index: (tabBar.items?.index(of: item))!)

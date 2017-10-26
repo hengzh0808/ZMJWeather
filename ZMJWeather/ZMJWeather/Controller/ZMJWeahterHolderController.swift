@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PromiseKit
 
 class ZMJWeahterHolderController: UIViewController {
 
@@ -20,6 +21,7 @@ class ZMJWeahterHolderController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // 监听地理位置变化
         initSubViews()
     }
 
@@ -29,29 +31,31 @@ class ZMJWeahterHolderController: UIViewController {
     
     func initSubViews() {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(showEditLocation(_:)))
-
         weak var weakSelf = self
-        _ = locationManager.locations(queue: DispatchQueue.main).then { (locations) -> Void in
+        let autoLocation = locationManager.queryAutoLocation(queue: DispatchQueue.main, update: false)
+        let manualLocations = locationManager.queryManualLocations(queue: DispatchQueue.main)
+        _ = when(fulfilled: autoLocation, manualLocations).then(execute: {(autoLocation, manualLocations) -> Void in
             weakSelf?.contentView.frame = CGRect.init(x: 0, y: 0, width: (weakSelf?.view.frame.width)!, height: (weakSelf?.view.frame.height)!);
-            weakSelf?.contentView.contentSize = CGSize.init(width: (weakSelf?.view.frame.width)! * CGFloat(locations.count + 1), height: (weakSelf?.view.frame.height)!)
+            weakSelf?.contentView.contentSize = CGSize.init(width: (weakSelf?.view.frame.width)! * CGFloat(manualLocations!.count + 1), height: (weakSelf?.view.frame.height)!)
             weakSelf?.contentView.isPagingEnabled = true;
             weakSelf?.contentView.showsHorizontalScrollIndicator = false
             weakSelf?.contentView.showsVerticalScrollIndicator = false
             weakSelf?.view.insertSubview((weakSelf?.contentView)!, at: 0)
-            
+            // 自动定位
             let controller = ZMJWeatherDetailController()
+            controller.locationInfo = autoLocation
             controller.view.frame = CGRect.init(x: 0, y: 0, width: (weakSelf?.view.frame.width)!, height: (weakSelf?.view.frame.height)!)
             weakSelf?.addChildViewController(controller)
             weakSelf?.contentView.addSubview(controller.view)
-        
-            for (index, location) in locations.enumerated() {
+            // 手动定位
+            for (index, location) in manualLocations!.enumerated() {
                 let controller = ZMJWeatherDetailController()
                 controller.locationInfo = location;
                 controller.view.frame = CGRect.init(x: (weakSelf?.view.frame.width)! * CGFloat(index + 1), y: 0, width: (weakSelf?.view.frame.width)!, height: (weakSelf?.view.frame.height)!)
                 weakSelf?.addChildViewController(controller)
                 weakSelf?.contentView.addSubview(controller.view)
             }
-        }
+        })
     }
     
     @IBAction func showEditLocation(_ sender: Any) {

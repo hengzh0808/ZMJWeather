@@ -13,9 +13,9 @@ let contractionFactor:CGFloat = 0.5
 
 class ZMJRecentWeatherView: UIView {
     
-    private var topView:ZMJRecentTopView = ZMJRecentTopView()
-    private var middleView:ZMJRecentMiddleView = ZMJRecentMiddleView()
-    private var bottomView:ZMJRecentBottomView = ZMJRecentBottomView()
+    var topView:ZMJRecentTopView = ZMJRecentTopView()
+    var middleView:ZMJRecentMiddleView = ZMJRecentMiddleView()
+    var bottomView:ZMJRecentBottomView = ZMJRecentBottomView()
     
     private var recentWeathers:Array<ZMJWeather> = []
     
@@ -38,7 +38,7 @@ class ZMJRecentWeatherView: UIView {
             topView.weathers = recentWeathers
             
             middleView.setTemps(recentWeathers: recentWeathers)
-            middleView.resetTemplines()
+            middleView.changeTemplines(withDirection: .down)
         }
     }
     
@@ -59,33 +59,19 @@ class ZMJRecentWeatherView: UIView {
     }
     
     private func initSubViews() {
-        topView.backgroundColor = ColorBlue
+        topView.backgroundColor = UIColor.clear
         self.addSubview(topView)
         
-        middleView.backgroundColor = ColorBlue
+        middleView.backgroundColor = UIColor.clear
         self.addSubview(middleView)
         
-        bottomView.backgroundColor = UIColor.blue
+        bottomView.backgroundColor = UIColor.red
         self.addSubview(bottomView)
-    }
-    
-    func showRecentDetails() {
-        topView.showDate()
-        middleView.showTemplines()
-    }
-    
-    func resetRecentDetails() {
-        topView.hideDate()
-        middleView.resetTemplines()
-    }
-    
-    func panBegin() {
-        topView.panBegin()
     }
 }
 
 // 未来天气
-private class ZMJRecentTopView: UIView {
+class ZMJRecentTopView: UIView {
     
     private var weatherViews:Array<WeatherView> = []
     var hideView:UIView = UIView.init()
@@ -106,9 +92,8 @@ private class ZMJRecentTopView: UIView {
         for (index, weather) in weathers.enumerated() {
             let weatherView = WeatherView.init(weather: weather)
             weatherView.backgroundColor = .clear
-            self.addSubview(weatherView)
             weatherViews.append(weatherView)
-            
+            self.addSubview(weatherView)
             let dateFormatter:DateFormatter = DateFormatter.init()
             dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
             let nowDate:Date! = dateFormatter.date(from: weather.date)
@@ -128,8 +113,8 @@ private class ZMJRecentTopView: UIView {
             weatherView.weatherSign.image = UIImage.init(named: signName as String)?.withRenderingMode(.alwaysTemplate)
             weatherView.tintColor = Color204
             
-            weatherView.maxTempLabel.text = weather.maxTemp
-            weatherView.minTempLabel.text = weather.minTemp
+            weatherView.maxTempLabel.text = weather.maxTemp + tempSign
+            weatherView.minTempLabel.text = weather.minTemp + tempSign
         }
         
         hideView.backgroundColor = UIColor.white
@@ -154,52 +139,27 @@ private class ZMJRecentTopView: UIView {
         }
     }
     
-    func showDate() {
+    func changeBackgroundColor(withDirection direction:AnimateDirection) {
+        hideView.alpha = direction == .up ? 0.0 : 1.0
         for weatherView in weatherViews {
-            weatherView.showDate()
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.hideView.alpha = 0.0
-        }
-    }
-    
-    func hideDate() {
-        for weatherView in weatherViews {
-            weatherView.hideDate()
-        }
-        UIView.animate(withDuration: 0.25) {
-            self.hideView.alpha = 1.0
+            weatherView.dateLabel.textColor = direction == .up ? UIColor.white : Color204
+            weatherView.weekLabel.textColor = direction == .up ? UIColor.white : Color204
+            weatherView.maxTempLabel.textColor = direction == .up ? UIColor.white : Color204
+            weatherView.minTempLabel.textColor = direction == .up ? UIColor.white : Color204
+            weatherView.weatherSign.tintColor = direction == .up ? UIColor.white : Color204
         }
     }
     
-    func panBegin() {
-        hideView.alpha = 0.0
-        for weatherView in weatherViews {
-            weatherView.dateLabel.textColor = UIColor.white
-            weatherView.weekLabel.textColor = UIColor.white
-            weatherView.maxTempLabel.textColor = UIColor.white
-            weatherView.minTempLabel.textColor = UIColor.white
-            weatherView.weatherSign.tintColor = UIColor.white
+    func changeStyle(withDirection direction:AnimateDirection = .pan, percent:CGFloat = CGFloat.leastNormalMagnitude) {
+        if (direction == .pan && percent == CGFloat.leastNormalMagnitude) ||  direction != .pan && percent != CGFloat.leastNormalMagnitude {
+            return
+        }
+        for weatherView in self.weatherViews {
+            weatherView.changeStyle(withPercent: percent != CGFloat.leastNormalMagnitude ? percent : direction == .up ? 1.0 : 0.0)
         }
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        panBegin()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        hideView.alpha = 1.0
-        for weatherView in weatherViews {
-            weatherView.dateLabel.textColor = Color204
-            weatherView.weekLabel.textColor = Color204
-            weatherView.maxTempLabel.textColor = Color204
-            weatherView.minTempLabel.textColor = Color204
-            weatherView.weatherSign.tintColor = Color204
-        }
-    }
-    
+    // MARK:最近天气小View
     private class WeatherView: UIView {
         var weather:ZMJWeather!
         var dateLabel:UILabel = UILabel()
@@ -207,6 +167,7 @@ private class ZMJRecentTopView: UIView {
         var weatherSign:UIImageView = UIImageView()
         var maxTempLabel:UILabel = UILabel()
         var minTempLabel:UILabel = UILabel()
+        var labelHeight:CGFloat = 0.0
         
         init(weather: ZMJWeather) {
             super.init(frame: CGRect.zero)
@@ -218,98 +179,62 @@ private class ZMJRecentTopView: UIView {
             fatalError("init(coder:) has not been implemented")
         }
         
+        override func draw(_ rect: CGRect) {
+            super.draw(rect)
+            labelHeight = (self.frame.height - 50 - 20.0) / 4.0
+            weekLabel.frame = CGRect.init(x: 0, y: 10.0, width: self.frame.width, height: labelHeight)
+            dateLabel.frame = CGRect.init(x: 0, y: weekLabel.frame.maxY + 10.0, width: self.frame.width, height: 0)
+            weatherSign.frame = CGRect.init(x: (self.frame.width - 50.0) / 2.0, y: weekLabel.frame.maxY + 5.0, width: 50.0, height: 50.0)
+            maxTempLabel.frame = CGRect.init(x: 0, y: weatherSign.frame.maxY, width: self.frame.width, height: 0)
+            minTempLabel.frame = CGRect.init(x: 0, y: maxTempLabel.frame.maxY + 10.0, width: self.frame.width, height: 0)
+        }
+        
         func initSubViews()  {
             weekLabel.textColor = Color204
-            weekLabel.font = UIFont.systemFont(ofSize: 12.0)
+            weekLabel.font = UIFont.systemFont(ofSize: 13.0)
+            weekLabel.textAlignment = .center
+            weekLabel.layer.masksToBounds = true
             addSubview(weekLabel)
-            weekLabel.snp.makeConstraints { (make) in
-                make.top.equalToSuperview().offset(6.0)
-                make.centerX.equalToSuperview()
-            }
             
             dateLabel.textColor = .white
-            dateLabel.font = UIFont.systemFont(ofSize: 12.0)
+            dateLabel.font = UIFont.systemFont(ofSize: 13.0)
+            dateLabel.textAlignment = .center
+            dateLabel.layer.masksToBounds = true
             addSubview(dateLabel)
-            dateLabel.snp.makeConstraints { (make) in
-                make.top.equalTo(weekLabel.snp.bottom).offset(0.0)
-                make.centerX.equalToSuperview()
-                make.height.equalTo(0.0)
-            }
             
             weatherSign.contentMode = UIViewContentMode.scaleAspectFit
             addSubview(weatherSign)
-            weatherSign.snp.makeConstraints { (make) in
-                make.top.equalTo(dateLabel.snp.bottom).offset(5.0)
-                make.width.equalTo(42.0)
-                make.height.equalTo(weatherSign.snp.width)
-                make.centerX.equalToSuperview()
-            }
             
             maxTempLabel.textColor = .white
-            maxTempLabel.font = UIFont.systemFont(ofSize: 12.0)
+            maxTempLabel.font = UIFont.systemFont(ofSize: 13.0)
+            maxTempLabel.textAlignment = .center
+            maxTempLabel.layer.masksToBounds = true
             addSubview(maxTempLabel)
-            maxTempLabel.snp.makeConstraints { (make) in
-                make.top.equalTo(weatherSign.snp.bottom).offset(5.0)
-                make.centerX.equalToSuperview()
-                make.height.equalTo(weekLabel.snp.height)
-            }
             
             minTempLabel.textColor = .white
-            minTempLabel.font = UIFont.systemFont(ofSize: 12.0)
+            minTempLabel.font = UIFont.systemFont(ofSize: 13.0)
+            minTempLabel.textAlignment = .center
+            minTempLabel.layer.masksToBounds = true
             addSubview(minTempLabel)
-            minTempLabel.snp.makeConstraints { (make) in
-                make.top.equalTo(maxTempLabel.snp.bottom).offset(5.0)
-                make.bottom.equalToSuperview()
-                make.centerX.equalToSuperview()
-                make.height.equalTo(weekLabel.snp.height)
-            }
         }
         
-        func showDate() {
-            dateLabel.snp.remakeConstraints { (make) in
-                make.top.equalTo(weekLabel.snp.bottom).offset(5.0)
-                make.centerX.equalToSuperview()
-                make.height.equalTo(weekLabel.snp.height)
+        func changeStyle(withPercent percent:CGFloat) {
+            if percent > 1.0 || percent < 0.0 {
+                return
             }
-            UIView.animate(withDuration: 0.25) {
-                self.layoutSubviews()
-                self.dateLabel.textColor = UIColor.white
-                self.weekLabel.textColor = UIColor.white
-                self.maxTempLabel.textColor = UIColor.white
-                self.minTempLabel.textColor = UIColor.white
-                self.weatherSign.tintColor = UIColor.white
-            }
-        }
-        
-        func hideDate() {
-            dateLabel.snp.remakeConstraints { (make) in
-                make.top.equalTo(weekLabel.snp.bottom).offset(0.0)
-                make.centerX.equalToSuperview()
-                make.height.equalTo(0.0)
-            }
-            UIView.animate(withDuration: 0.25) {
-                self.layoutSubviews()
-                self.dateLabel.textColor = Color204
-                self.weekLabel.textColor = Color204
-                self.maxTempLabel.textColor = Color204
-                self.minTempLabel.textColor = Color204
-                self.weatherSign.tintColor = Color204
-            }
-        }
-        
-        func set(offsetRatio:Float) {
-            let color = UIColor.init(red: (CGFloat(204 + 51 * offsetRatio)) / 255.0, green: (CGFloat(204 + 51 * offsetRatio)) / 255.0, blue: (CGFloat(204 + 51 * offsetRatio)) / 255.0, alpha: 1.0)
-            self.dateLabel.textColor = color
-            self.weekLabel.textColor = color
-            self.maxTempLabel.textColor = color
-            self.minTempLabel.textColor = color
-            self.weatherSign.tintColor = color
+            let inset:CGFloat = percent == 1.0 ? 5.0 : 0
+            labelHeight = (self.frame.height - 50 - 20.0) / 4.0
+            weekLabel.frame = CGRect.init(x: 0, y: 10.0 * (1 - percent), width: self.frame.width, height: labelHeight)
+            dateLabel.frame = CGRect.init(x: 0, y: weekLabel.frame.maxY + 10.0, width: self.frame.width, height: labelHeight * percent)
+            weatherSign.frame = CGRect.init(x: (self.frame.width - 50.0) / 2.0, y: dateLabel.frame.maxY - 5 * (1 - percent), width: 50.0, height: 50.0).insetBy(dx: inset, dy: inset)
+            maxTempLabel.frame = CGRect.init(x: 0, y: weatherSign.frame.maxY + inset, width: self.frame.width, height: labelHeight * percent)
+            minTempLabel.frame = CGRect.init(x: 0, y: maxTempLabel.frame.maxY + 10.0, width: self.frame.width, height: labelHeight * percent)
         }
     }
 }
 
 // 未来温度
-private class ZMJRecentMiddleView: UIView {
+class ZMJRecentMiddleView: UIView {
     var maxTemps:Array<Int> = []
     var minTemps:Array<Int> = []
     var maxTemp:Int = 0
@@ -412,23 +337,23 @@ private class ZMJRecentMiddleView: UIView {
         }
     }
     
-    func showTemplines() {
-        draw(minTemps: minTemps, maxTemps: maxTemps, animete: true)
-    }
-    
-    func resetTemplines() {
-        var averageMaxTemps:Array<Int> = []
-        var averageMinTemps:Array<Int> = []
-        
-        for _ in 0..<maxTemps.count {
-            averageMaxTemps.append(maxTemp - (maxTemp - minTemp) / 3)
+    func changeTemplines(withDirection direction:AnimateDirection) {
+        if direction == .up {
+            draw(minTemps: minTemps, maxTemps: maxTemps, animete: true)
+        } else if direction == .down {
+            var averageMaxTemps:Array<Int> = []
+            var averageMinTemps:Array<Int> = []
+            
+            for _ in 0..<maxTemps.count {
+                averageMaxTemps.append(maxTemp - (maxTemp - minTemp) / 3)
+            }
+            
+            for _ in 0..<minTemps.count {
+                averageMinTemps.append(minTemp + (maxTemp - minTemp) / 3)
+            }
+            
+            draw(minTemps: averageMinTemps, maxTemps: averageMaxTemps, animete: false)
         }
-        
-        for _ in 0..<minTemps.count {
-            averageMinTemps.append(minTemp + (maxTemp - minTemp) / 3)
-        }
-        
-        draw(minTemps: averageMinTemps, maxTemps: averageMaxTemps, animete: false)
     }
     
     private func draw(minTemps:Array<Int>, maxTemps:Array<Int>, animete:Bool) {
@@ -617,6 +542,6 @@ private class ZMJRecentMiddleView: UIView {
     }
 }
 
-private class ZMJRecentBottomView: UIView {
+class ZMJRecentBottomView: UIView {
     
 }

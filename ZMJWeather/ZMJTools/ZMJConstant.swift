@@ -15,3 +15,9 @@ let Color229 = UIColor.init(red: 229/255.0, green: 229/255.0, blue: 229/255.0, a
 let upArrow = "↑"
 let downArrow = "↓"
 let tempSign = "°"
+
+enum AnimateDirection : String {
+    case pan = "pan"
+    case up = "up"
+    case down = "donw"
+}

@@ -26,6 +26,9 @@ class ZMJWeatherNavController: UINavigationController, UIGestureRecognizerDelega
         if complete != nil {
             complete(!self.locationShow)
         }
+        if !self.locationShow {
+            locationController.viewWillAppear(true)
+        }
         UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: {
             view.frame = CGRect.init(origin: CGPoint.init(x: view.frame.width * (self.locationShow ? 0.0 : 0.8), y: 0), size: view.frame.size)
             self.locationShow = !self.locationShow

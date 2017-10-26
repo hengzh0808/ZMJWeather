@@ -13,4 +13,5 @@ target ‘ZMJWeather’ do
     pod 'FSCalendar'
     pod 'FMDB'
     pod 'SVProgressHUD'
+    pod 'pop', '~> 1.0.10'
 end

@@ -72,30 +72,22 @@ class ZMJDetailWeatherView: UIScrollView {
         }
     }
     
-    func animteWeatherView(top:Bool) {
-        if top {
-            weatherView.snp.remakeConstraints({ (make) in
-                make.top.equalToSuperview().offset(64)
-                make.left.equalToSuperview().offset(39)
-                make.height.equalTo(65)
-            })
-        } else {
-            weatherView.snp.remakeConstraints({ (make) in
-                make.top.equalToSuperview().offset(150.0)
-                make.centerX.equalToSuperview()
-                make.height.equalTo(65)
-            })
+    func changeWeatherView(withDirection direction:AnimateDirection = .pan, percent:CGFloat = CGFloat.leastNormalMagnitude) {
+        let centerX = (self.frame.width - self.weatherView.frame.width) / 2.0
+        if direction == .pan && self.weatherView.frame.minY > 65.0 {
+            self.weatherView.frame = CGRect.init(origin: CGPoint.init(x: centerX - (centerX - 39.0) * percent, y: 150.0 - (150.0 - 65.0) * percent), size: self.weatherView.frame.size)
+        } else if direction == .up {
+            self.weatherView.frame = CGRect.init(origin: CGPoint.init(x: 39.0, y: 65.0), size: self.weatherView.frame.size)
+        } else if direction == .down {
+            self.weatherView.frame = CGRect.init(origin: CGPoint.init(x: centerX, y: 150.0), size: self.weatherView.frame.size)
         }
-        UIView.animate(withDuration: 0.25) { 
-            self.layoutIfNeeded()
-            self.weatherView.dateLable.alpha = top ? 1.0 : 0.0
-            self.weatherView.weekLabel.alpha = top ? 1.0 : 0.0
-            self.weatherView.aqiView.alpha = top ? 1.0 : 0.0
-            self.weatherView.weatherSign.alpha = top ? 1.0 : 0.0
-        }
+        self.weatherView.dateLable.alpha = direction == .pan ? 0.0 : direction == .up ? 1.0 : 0.0
+        self.weatherView.weekLabel.alpha = direction == .pan ? 0.0 : direction == .up ? 1.0 : 0.0
+        self.weatherView.aqiView.alpha = direction == .pan ? 0.0 : direction == .up ? 1.0 : 0.0
+        self.weatherView.weatherSign.alpha = direction == .pan ? 0.0 : direction == .up ? 1.0 : 0.0
     }
     
-    func set(now:NSDictionary!, today:NSDictionary!, aqi:NSDictionary!) {
+    func setWeather(withNow now:NSDictionary!, today:NSDictionary!, aqi:NSDictionary!) {
         detailWeather.weatherCode =  ((now.value(forKey: "cond") as? NSDictionary)?.value(forKey: "code") as? String) ?? ""
         detailWeather.weatherText =  ((now.value(forKey: "cond") as? NSDictionary)?.value(forKey: "txt") as? String) ?? ""
         detailWeather.nowTemp = (now.value(forKey: "tmp") as? String) ?? ""

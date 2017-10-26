@@ -77,6 +77,8 @@ typedef NS_ENUM(NSInteger, AMapNearbySearchType)
 @property (nonatomic, copy)   NSString *city; 
 ///强制城市限制功能 默认NO，例如：在上海搜索天安门，如果citylimit为true，将不返回北京的天安门相关的POI
 @property (nonatomic, assign) BOOL cityLimit;
+///设置后，如果sortrule==0，则返回结果会按照距离此点的远近来排序,since 5.2.1
+@property (nonatomic, strong) AMapGeoPoint *location;
 
 @end
 

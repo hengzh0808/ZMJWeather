@@ -11,6 +11,11 @@ import PromiseKit
 import FMDB
 import SwiftyJSON
 
+enum LocationType:String {
+    case Auto = "auto"
+    case Manual = "manual"
+}
+
 @objc class LocationInfo:NSObject {
     var latitude:Double!
     var longitude:Double!
@@ -18,12 +23,11 @@ import SwiftyJSON
     var province:String! // 省
     var city:String! // 市
     var district:String! // 区
+    var type:LocationType = LocationType.Manual
 }
 
-enum LocationType:String {
-    case Auto = "auto"
-    case Manual = "manual"
-}
+let LocationUpdate:Notification = Notification.init(name: Notification.Name(rawValue: "LocationUpdate"))
+let WeatherUpdate:Notification = Notification.init(name: Notification.Name(rawValue: "WeatherUpdate"))
 
 typealias AddressHandlerStart = @convention(block) () -> Void
 typealias AddressHandlerSuccess = @convention(block) (LocationInfo) -> Void
@@ -43,18 +47,20 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
     
     override init() {
         super.init()
+        
         let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
         dbQueue = FMDatabaseQueue.init(path: path?.appending("/weather.sqlite"))
         dbQueue.inDatabase { (db) in
             do {
-                // 地理位置表
-                try db.executeUpdate("create table if not exists location(adcode text, type text,latitude float, longitude float, province text, city text, district text, primary key(adcode, type))", values: nil)
-            } catch {}
-            
-            do {
+                // 手动位置表
+                try db.executeUpdate("create table if not exists autoLocation(adcode text, latitude float, longitude float, province text, city text, district text, primary key(adcode))", values: nil)
+                // 自动地理位置
+                try db.executeUpdate("create table if not exists manualLocation(adcode text, latitude float, longitude float, province text, city text, district text, primary key(adcode))", values: nil)
                 // 天气信息
                 try db.executeUpdate("create table if not exists weather(weather text, adcode text primary key)", values: nil)
-            } catch {}
+            } catch {
+                print("创建表失败")
+            }
         }
     }
     
@@ -77,6 +83,7 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
             if let reGeocode = reGeocode {
                 locationInfo.city = reGeocode.city
                 locationInfo.district = reGeocode.district
+                locationInfo.adcode = reGeocode.adcode
             }
             fulfill(locationInfo)
         }
@@ -120,13 +127,21 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         }
     }
     
+    // MARK:数据库操作
     func saveLocation(location:LocationInfo, type:LocationType) -> Promise<Bool> {
         let (promise, fulfill, reject) = Promise<Bool>.pending()
         DispatchQueue.global(qos: .userInitiated).async {
             self.dbQueue.inDatabase { (db) in
                 do {
-                    try db.executeUpdate("insert into location (adcode, type, latitude, longitude, province, city, district) values (?, ?, ?, ?, ?, ?)", values: [location.adcode, type.rawValue, location.latitude ?? "", location.longitude ?? 0.0, location.province ?? 0.0, location.city ?? "", location.district ?? ""])
+                    if type == LocationType.Auto {
+                        try db.executeUpdate("delete from autoLocation", values: [])
+                        try db.executeUpdate("insert into autoLocation (adcode, latitude, longitude, province, city, district) values (?, ?, ?, ?, ?, ?)", values: [location.adcode, location.latitude ?? 0.0, location.longitude ?? 0.0, location.province ?? "", location.city ?? "", location.district ?? ""])
+                    } else {
+                        try db.executeUpdate("delete from manualLocation where adcode = ?", values: [location.adcode])
+                        try db.executeUpdate("insert into manualLocation (adcode, latitude, longitude, province, city, district) values (?, ?, ?, ?, ?, ?)", values: [location.adcode, location.latitude ?? 0.0, location.longitude ?? 0.0, location.province ?? "", location.city ?? "", location.district ?? ""])
+                    }
                     fulfill(true)
+                    NotificationCenter.default.post(LocationUpdate)
                 } catch {
                     reject(error)
                 }
@@ -139,26 +154,32 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         DispatchQueue.global(qos: .userInitiated).async {
             self.dbQueue.inDatabase({ (db) in
                 do {
+                    try db.executeUpdate("delete from weather where adcode = ?", values: [adcode])
                     try db.executeUpdate("insert into weather (adcode, weather) values (?, ?)", values: [adcode ?? "", JSON.init(rawValue: weatherInfo)?.rawString()! ?? ""])
+                    NotificationCenter.default.post(WeatherUpdate)
                 } catch {
                     do {
                         try db.executeUpdate("update weather set weather = ? where adcode = ?", values: [JSON.init(rawValue: weatherInfo)?.rawString()! ?? "", adcode ?? ""])
+                        NotificationCenter.default.post(WeatherUpdate)
                     } catch {}
                 }
             })
         }
     }
     
-    func weather(adcode:String!) -> Promise<NSDictionary?> {
+    func queryWeather(adcode:String!) -> Promise<NSDictionary?> {
         let (promise, fulfill, reject) = Promise<NSDictionary?>.pending()
         DispatchQueue.global(qos: .userInitiated).async {
+            if (adcode == nil) {
+                
+            }
             self.dbQueue.inDatabase({ (db) in
                 do {
                     let result:FMResultSet = try db.executeQuery("select * from weather where adcode = ?", values: [adcode])
                     var weatherInfo:NSDictionary?
                     while result.next() {
                         let value = result.string(forColumn: "weather")
-                        weatherInfo = JSON.init(parseJSON: value!).dictionaryObject as? NSDictionary
+                        weatherInfo = JSON.init(parseJSON: value!).dictionaryObject as NSDictionary?
                     }
                     fulfill(weatherInfo)
                 } catch {
@@ -169,12 +190,12 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
         return promise
     }
     
-    func locations(queue:DispatchQueue = DispatchQueue.global(qos: .userInitiated)) -> Promise<Array<LocationInfo>> {
-        let (promise, fulfill, reject) = Promise<Array<LocationInfo>>.pending()
+    func queryManualLocations(queue:DispatchQueue = DispatchQueue.global(qos: .userInitiated)) -> Promise<Array<LocationInfo>?> {
+        let (promise, fulfill, _) = Promise<Array<LocationInfo>?>.pending()
         queue.async {
             self.dbQueue.inDatabase({ (db) in
                 do {
-                    let result:FMResultSet = try db.executeQuery("select * from location", values: nil)
+                    let result:FMResultSet = try db.executeQuery("select * from manualLocation", values: nil)
                     var locations:Array<LocationInfo> = []
                     while result.next() {
                         let location = LocationInfo.init()
@@ -184,11 +205,45 @@ class ZMJLocationManager: NSObject, AMapSearchDelegate {
                         location.province = result.string(forColumn: "province")!
                         location.city = result.string(forColumn: "city")!
                         location.district = result.string(forColumn: "district")!
+                        location.type = LocationType.Manual
                         locations.append(location)
                     }
                     fulfill(locations)
                 } catch {
-                    reject(error)
+                    fulfill(nil)
+                }
+            })
+        }
+        return promise
+    }
+    
+    func queryAutoLocation(queue:DispatchQueue = DispatchQueue.global(qos: .userInitiated), update:Bool = true) -> Promise<LocationInfo?> {
+        let (promise, fulfill, _) = Promise<LocationInfo?>.pending()
+        queue.async {
+            self.dbQueue.inDatabase({ (db) in
+                do {
+                    let result:FMResultSet = try db.executeQuery("select * from autoLocation", values: nil)
+                    var autoLocation:LocationInfo?
+                    while result.next() {
+                        let location = LocationInfo.init()
+                        location.adcode = result.string(forColumn: "adcode")!
+                        location.latitude = result.double(forColumn: "latitude")
+                        location.longitude = result.double(forColumn: "longitude")
+                        location.province = result.string(forColumn: "province")!
+                        location.city = result.string(forColumn: "city")!
+                        location.district = result.string(forColumn: "district")!
+                        location.type = LocationType.Auto
+                        autoLocation = location
+                    }
+                    if update && autoLocation == nil {
+                        _ = self.updateLocation().then(execute: { (location) -> Void in
+                            fulfill(location)
+                        })
+                    } else {
+                        fulfill(autoLocation)
+                    }
+                } catch {
+                    fulfill(nil)
                 }
             })
         }
