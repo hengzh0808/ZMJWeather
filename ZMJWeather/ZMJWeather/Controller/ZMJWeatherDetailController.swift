@@ -133,7 +133,8 @@ class ZMJWeatherDetailController: UIViewController, UIGestureRecognizerDelegate 
             panGesture.setTranslation(CGPoint.zero, in: panGesture.view)
             distance = distance * ratio
             recentWeatherView.frame = CGRect.init(origin: CGPoint.init(x: 0.0, y:recentWeatherView.frame.minY + distance), size: recentWeatherView.frame.size)
-            let percent:CGFloat = 1 - (recentWeatherView.frame.minY - self.view.frame.height * 0.37) / ((self.view.frame.height - 85.0) - self.view.frame.height * 0.37)
+            let current = (recentWeatherView.frame.minY - self.view.frame.height * 0.37) / (self.view.frame.height - 85.0 - self.view.frame.height * 0.37)
+            let percent:CGFloat = 1 - current
             recentWeatherView.topView.changeStyle(percent: percent)
             detailWeatherView.changeWeatherView(percent: percent)
             break

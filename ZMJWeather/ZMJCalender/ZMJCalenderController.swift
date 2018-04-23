@@ -22,7 +22,6 @@ class ZMJCalenderController: UIViewController {
 //        topBarView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
 //        topBarView.layer.shadowRadius = 2.0
 //        topBarView.layer.shadowOpacity = 1.0
-        
         calenderView.scrollDirection = FSCalendarScrollDirection.vertical
         calenderView.pagingEnabled = false; // important
     }

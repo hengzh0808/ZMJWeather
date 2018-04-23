@@ -137,10 +137,16 @@ typedef NS_ENUM(NSInteger, AMapSearchLanguage)
 - (void)AMapTransitRouteSearch:(AMapTransitRouteSearchRequest *)request;
 
 /**
- * @brief 骑行路径规划查询接口 (v4.3.0)
+ * @brief 骑行路径规划查询接口 (since 4.3.0)
  * @param request 查询选项。具体属性字段请参考 AMapRidingRouteSearchRequest 类。
  */
 - (void)AMapRidingRouteSearch:(AMapRidingRouteSearchRequest *)request;
+
+/**
+ * @brief 货车路径规划查询接口 （since 6.1.0）
+ * @param request 查询选项。具体属性字段请参考 AMapTruckRouteSearchRequest 类。
+ */
+- (void)AMapTruckRouteSearch:(AMapTruckRouteSearchRequest *)request;
 
 /**
  * @brief 天气查询接口
@@ -153,6 +159,18 @@ typedef NS_ENUM(NSInteger, AMapSearchLanguage)
  * @param request 查询选项。具体属性字段请参考 AMapRoadTrafficSearchRequest 类。
  */
 - (void)AMapRoadTrafficSearch:(AMapRoadTrafficSearchRequest *)request;
+
+/**
+ * @brief 查询圆形区域内道路的实时路况 since 5.5.0
+ * @param request 查询选项。具体属性字段请参考 AMapRoadTrafficSearchRequest 类。
+ */
+- (void)AMapRoadTrafficCircleSearch:(AMapRoadTrafficCircleSearchRequest *)request;
+
+/**
+ * @brief 距离查询（since 6.1.0）
+ * @param request 查询选项。具体属性字段请参考 AMapDistanceSearchRequest 类。
+ */
+- (void)AMapDistanceSearch:(AMapDistanceSearchRequest *)request;
 
 #pragma mark - 附近搜索相关
 
@@ -293,6 +311,13 @@ typedef NS_ENUM(NSInteger, AMapSearchLanguage)
 - (void)onRouteSearchDone:(AMapRouteSearchBaseRequest *)request response:(AMapRouteSearchResponse *)response;
 
 /**
+ * @brief 距离查询回调
+ * @param request  发起的请求，具体字段参考 AMapDistanceSearchRequest 及其子类。
+ * @param response 响应结果，具体字段参考 AMapDistanceSearchResponse 。
+ */
+- (void)onDistanceSearchDone:(AMapDistanceSearchRequest *)request response:(AMapDistanceSearchResponse *)response;
+
+/**
  * @brief 天气查询回调
  * @param request  发起的请求，具体字段参考 AMapWeatherSearchRequest 。
  * @param response 响应结果，具体字段参考 AMapWeatherSearchResponse 。
@@ -302,10 +327,10 @@ typedef NS_ENUM(NSInteger, AMapSearchLanguage)
 
 /**
  * @brief 道路路况查询回调 since 5.1.0
- * @param request  发起的请求，具体字段参考 AMapRoadTrafficSearchRequest 。
+ * @param request  发起的请求，具体字段参考 AMapRoadTrafficSearchBaseRequest 及其子类 。
  * @param response 响应结果，具体字段参考 AMapRoadTrafficSearchResponse 。
  */
-- (void)onRoadTrafficSearchDone:(AMapRoadTrafficSearchRequest *)request response:(AMapRoadTrafficSearchResponse *)response;
+- (void)onRoadTrafficSearchDone:(AMapRoadTrafficSearchBaseRequest *)request response:(AMapRoadTrafficSearchResponse *)response;
 #pragma mark - 附近搜索回调
 
 /**

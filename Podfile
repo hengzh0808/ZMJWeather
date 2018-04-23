@@ -2,7 +2,7 @@ platform:ios, '8.0'
 use_frameworks!
 target ‘ZMJWeather’ do
 	pod 'Alamofire'
-    pod 'SnapKit'
+    pod 'SnapKit', '>= 4.0.0'
     pod 'PromiseKit', '~> 4.2.2'
     pod 'SwiftyJSON'
     pod 'MJRefresh'
